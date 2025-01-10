@@ -2,6 +2,7 @@ import 'package:calendar_timeline/calendar_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
+import 'package:kenzy/objectBox/classeObjectBox.dart';
 import 'package:kenzy/objectBox/pages/addProduct.dart';
 import 'package:provider/provider.dart';
 import '../../Entity.dart';
@@ -12,9 +13,9 @@ import '../FactureListScreen.dart';
 import 'FacturePage.dart';
 
 class FacturesListPage extends StatefulWidget {
-  final Function(Document) onFactureSelected;
-
-  FacturesListPage({required this.onFactureSelected});
+  // final Function(Document) onFactureSelected;
+  //
+  // FacturesListPage({required this.onFactureSelected});
 
   @override
   State<FacturesListPage> createState() => _FacturesListPageState();
@@ -254,8 +255,8 @@ class _FacturesListPageState extends State<FacturesListPage> {
                                   // onTap: () {
                                   //   Navigator.of(context).push(
                                   //     MaterialPageRoute(
-                                  //       builder: (context) =>
-                                  //           new FacturePage(factureToEdit: facture),
+                                  //       builder: (context) => new FacturePage(
+                                  //           factureToEdit: facture),
                                   //       // FactureDetailPage(
                                   //       //   facture: facture,
                                   //       //   cartProvider: cartProvider,

@@ -70,13 +70,9 @@ class _ClientSelectionPageState extends State<ClientSelectionPage> {
                 setState(() {
                   _selectedClient = newClient;
                   _filteredClients;
-                  print("filtred client maj.");
                 });
                 cartProvider.setSelectedClient(newClient);
-              } else {
-                print(
-                    "Le client n'a pas été créé ou l'opération a été annulée.");
-              }
+              } else {}
             },
           ),
         ],

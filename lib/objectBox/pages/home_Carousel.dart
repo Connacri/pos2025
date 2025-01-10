@@ -17,6 +17,8 @@ import '../tests/hotel2.dart';
 import '../tests/hotelScreen.dart';
 import '../tests/hotelScreenFiable.dart';
 import 'ProduitListScreen.dart';
+import 'facturation/FacturePage.dart';
+import 'facturation/textfacture.dart';
 
 //////////////////////////////////////////////////test//////////////////////////////
 class CarouselExample extends StatefulWidget {
@@ -213,7 +215,8 @@ class _CarouselExampleState extends State<CarouselExample> {
                       // Action à réaliser lorsque l'élément est cliqué
                       if (index == 0) {
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ProduitListScreen(),
+                          builder: (context) => FacturePageTest(),
+                          //   ProduitListScreen(),
                         ));
                       } else if (index == 1) {
                         Navigator.of(context).push(MaterialPageRoute(

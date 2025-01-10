@@ -20,7 +20,6 @@ import '../Utils/country_flags.dart';
 import '../Utils/winMobile.dart';
 import '../classeObjectBox.dart';
 import '../tests/doublons.dart';
-import 'Edit_Produit.dart';
 import 'FournisseurListScreen.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;

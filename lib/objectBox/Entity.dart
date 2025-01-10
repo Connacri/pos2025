@@ -121,7 +121,8 @@ class Produit {
     qrCodeList = codes; // Met à jour la chaîne JSON avec la nouvelle liste
   }
 
-  double get stock => approvisionnements.fold(0, (sum, a) => sum + a.quantite);
+  double get stock =>
+      approvisionnements.fold(0.0, (sum, appro) => sum + appro.quantite);
 
 // Méthode pour calculer le stock total à partir des approvisionnements
   double calculerStockTotal() {
@@ -233,18 +234,17 @@ class Crud {
   factory Crud.fromJson(Map<String, dynamic> json) {
     return Crud(
       id: json['id'] ?? 0,
-      createdBy: (json['createdBy']).toInt(),
-      updatedBy: (json['updatedBy']).toInt(),
-      deletedBy: (json['deletedBy']).toInt(),
+      createdBy: json['createdBy']?.toInt(),
+      updatedBy: json['updatedBy']?.toInt() ?? 1,
+      deletedBy: json['deletedBy']?.toInt(),
       dateCreation: json['dateCreation'] != null
           ? DateTime.parse(json['dateCreation'])
-          : null,
+          : DateTime.now(),
       dateDeleting: json['dateDeleting'] != null
           ? DateTime.parse(json['dateDeleting'])
           : null,
       derniereModification: DateTime.parse(
-          json['derniereModification'] //?? DateTime.now().toIso8601String()
-          ),
+          json['derniereModification'] ?? DateTime.now().toIso8601String()),
     );
   }
 }

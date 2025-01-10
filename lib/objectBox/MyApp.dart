@@ -2,48 +2,31 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kenzy/objectBox/pages/home_Carousel.dart';
 import 'package:kenzy/objectBox/tests/hotelScreen.dart';
-import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../objectBox/pages/addProduct.dart';
-import '../objectBox/pages/addProduct.dart';
-import 'package:window_manager/window_manager.dart';
 import '../objectBox/pages/ClientListScreen.dart';
-import '../objectBox/pages/FactureListScreen.dart';
 import '../objectBox/tests/cruds.dart' as cruds;
 import '../../MyListLotties.dart';
+import '../objectbox.g.dart';
 import 'Entity.dart';
 import 'MyProviders.dart';
-import 'Utils/ads/AnchoredAdaptiveExample.dart';
-import 'Utils/ads/FluidExample.dart';
-import 'Utils/ads/InlineAdaptiveExample.dart';
-import 'Utils/ads/NativeTemplateExample.dart';
-import 'Utils/ads/WebViewExample.dart';
-import 'Utils/ads/homeExemple.dart';
 import 'Utils/excel.dart';
-import 'Utils/mobile_scanner/main.dart';
 import 'Utils/supabase_sync.dart';
 import 'Utils/winMobile.dart';
 import 'classeObjectBox.dart';
 import 'hash.dart';
-import 'hash2.dart';
 import 'pages/FournisseurListScreen.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
 import 'dart:io';
-import 'package:faker/faker.dart' as Faker;
-
 import 'pages/ProduitListScreen.dart';
-import 'pages/ProduitListSupabase.dart' as supa;
 import 'pages/facturation/FacturePage.dart';
 import 'pages/facturation/FacturesListPage.dart';
-import 'pages/facturation/factureancien.dart';
-import 'pages/invoice/multiProviders.dart';
+import 'pages/invoice/FacturationPageUI.dart';
 import 'pages/invoice/providers.dart';
 import 'tests/hotelScreenFiable.dart';
 
@@ -83,6 +66,7 @@ class MyApp9 extends StatelessWidget {
     if (objectBox == null) {
       return Center(child: CircularProgressIndicator());
     }
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CrudProvider(objectBox)),
@@ -102,9 +86,7 @@ class MyApp9 extends StatelessWidget {
           create: (_) => ThemeProvider(),
         ),
 //////////////////////////////////////////////////////////////////
-
-        ChangeNotifierProvider(create: (_) => CommerceProvider1(ObjectBox())),
-        ChangeNotifierProvider(create: (_) => CartProvider1(ObjectBox())),
+        ChangeNotifierProvider(create: (_) => FacturationProvider()),
       ],
       child: Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
         return MaterialApp(
@@ -132,9 +114,10 @@ class MyApp9 extends StatelessWidget {
 
           //darkTheme: ThemeData.dark(),
 
-          home: /*showPlatform*/ adaptiveHome(
-            objectBox: objectBox,
-          ),
+          // home: /*showPlatform*/ adaptiveHome(
+          //   objectBox: objectBox,
+          // ),
+          home: FacturationPageUI(),
         );
       }),
     );
@@ -311,14 +294,14 @@ class _adaptiveHomeState extends State<adaptiveHome> {
 
   List<Widget> _widgetOptions() {
     return [
-      Container(), //homeRail(),
       FacturesListPage(
-        onFactureSelected: (facture) {
-          setState(() {
-            selectedFacture = facture;
-          });
-        },
-      ),
+          // onFactureSelected: (facture) {
+          //   setState(() {
+          //     selectedFacture = facture;
+          //   });
+          // },
+          ),
+      Container(), //homeRail(),
       Container(),
       //FournisseurListScreen(),
     ];
@@ -965,14 +948,14 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                                                   showForcedRewardedAd(
                                                     context,
                                                     FacturesListPage(
-                                                      onFactureSelected:
-                                                          (facture) {
-                                                        setState(() {
-                                                          selectedFacture =
-                                                              facture;
-                                                        });
-                                                      },
-                                                    ),
+                                                        // onFactureSelected:
+                                                        //     (facture) {
+                                                        //   setState(() {
+                                                        //     selectedFacture =
+                                                        //         facture;
+                                                        //   });
+                                                        // },
+                                                        ),
                                                   ),
                                               // onPressed: () {
                                               //   Navigator.of(context).push(MaterialPageRoute(
@@ -1177,13 +1160,6 @@ class _adaptiveHomeState extends State<adaptiveHome> {
               appBar: AppBar(
                 title: Text('POS Desktop'),
                 actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (ctx) => start()));
-                    },
-                    icon: Icon(Icons.face, color: Colors.orange),
-                  ),
                   WinMobile(),
 
                   // Switch(
@@ -1276,12 +1252,12 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (ctx) => FacturesListPage(
-                          onFactureSelected: (facture) {
-                            setState(() {
-                              selectedFacture = facture;
-                            });
-                          },
-                        ),
+                            // onFactureSelected: (facture) {
+                            //   setState(() {
+                            //     selectedFacture = facture;
+                            //   });
+                            // },
+                            ),
                       ));
                     },
                     icon: Icon(Icons.hail_outlined),
@@ -1362,20 +1338,20 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                         ],
                       ),
                       _selectedIndex == 0
-                          ? buildExpanded(context, randomId, produitProvider,
-                              produitsFiltres, roomNumbers
-                              // produitsLowStock,
-                              // produitsLowStock0,
-                              )
+                          ? Expanded(flex: 5, child: FacturePage())
                           : _selectedIndex == 1
-                              ? Expanded(flex: 5, child: FacturePage())
+                              ? buildExpanded(context, randomId,
+                                  produitProvider, produitsFiltres, roomNumbers
+                                  // produitsLowStock,
+                                  // produitsLowStock0,
+                                  )
                               : Expanded(
                                   flex: 1,
                                   child: CarouselExample(
                                     provider: produitProvider,
                                   ),
                                 ),
-                      _selectedIndex == 1
+                      _selectedIndex == 0
                           ? Expanded(
                               flex: 2,
                               child: _widgetOptions()[_selectedIndex],

@@ -1,262 +1,392 @@
-import 'package:flutter/material.dart';
-import 'package:objectbox/objectbox.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../../../objectbox.g.dart';
 import '../../Entity.dart';
 import '../../classeObjectBox.dart';
 
-class CommerceProvider1 extends ChangeNotifier {
-  final ObjectBox _objectBox;
-
-  CommerceProvider1(this._objectBox);
-
-  Future<Produit?> getProduitByQr(String qrCode) async {
-    final query = _objectBox.produitBox.query(Produit_.qr.equals(qrCode));
-    final produits = await query.build().find();
-    return produits.isNotEmpty ? produits.first : null;
-  }
-
-  Future<void> updateProduitStock(Produit produit, double quantity) async {
-    // Find the corresponding approvisionnement
-    final approvisionnement = produit.approvisionnements.firstWhere(
-      (a) => a.quantite >= quantity,
-      orElse: () =>
-          throw Exception('Not enough stock for product: ${produit.nom}'),
-    );
-
-    if (approvisionnement != null) {
-      // Update the quantity of the approvisionnement
-      approvisionnement.quantite -= quantity;
-      _objectBox.approvisionnementBox.put(approvisionnement);
-    } else {
-      throw Exception('Not enough stock for product: ${produit.nom}');
-    }
-  }
-}
-
-class CartProvider1 extends ChangeNotifier {
-  final ObjectBox _objectBox;
-  Document _facture = Document(
-    date: DateTime.now(),
-    qrReference: '',
-    impayer: 0.0,
-    derniereModification: DateTime.now(),
-    type: '',
-  );
-  Client? _selectedClient;
+class FacturationProvider with ChangeNotifier {
   List<Document> _factures = [];
-  Produit? produit;
+  Document? _factureEnCours;
+  Document? _factureEnEdition; // Copie de la facture en cours d'édition
+  List<LigneDocument> _lignesFacture = [];
+  List<Produit> _produitsTrouves = [];
+  final Map<int, LigneEditionState> _ligneEditionStates = {};
 
-  Document get facture => _facture;
-
-  Client? get selectedClient => _selectedClient;
+  Document? get factureEnEdition => _factureEnEdition;
 
   List<Document> get factures => _factures;
 
-  int get factureCount => _factures.length;
+  Document? get factureEnCours => _factureEnCours;
 
-  CartProvider1(this._objectBox) {
-    fetchFactures();
+  List<LigneDocument> get lignesFacture => _lignesFacture;
+
+  List<Produit> get produitsTrouves => _produitsTrouves;
+  Client? _clientSelectionne;
+
+  final ObjectBox _objectBox = ObjectBox();
+
+  FacturationProvider() {
+    _objectBox.init().then((_) {
+      _chargerFactures();
+    });
   }
 
-  void selectFacture(Document facture) {
-    _facture = facture;
-    notifyListeners();
-  }
+  Client? _selectedClient;
 
-  void fetchFactures() {
-    _factures = _objectBox.factureBox.getAll();
-    notifyListeners();
-  }
+  Client? get selectedClient => _selectedClient;
 
-  void updateImpayer(double newImpayer) {
-    _facture.impayer = newImpayer;
-    notifyListeners();
-  }
+// Ajoutez un champ pour gérer l'impayé
+  double _impayer = 0.0;
 
-  void setSelectedClient(Client client) {
-    _selectedClient = client;
-    notifyListeners();
+  double get impayer => _impayer;
+
+  void setImpayer(double value) {
+    _impayer = value;
+    // notifyListeners();
   }
 
   void selectClient(Client client) {
     _selectedClient = client;
-    _facture.client.target = client;
+    if (_factureEnEdition != null) {
+      _factureEnEdition!.client.target = client;
+    }
     notifyListeners();
   }
 
+  // Méthode pour réinitialiser le client sélectionné
   void resetClient() {
     _selectedClient = null;
+    if (_factureEnCours != null) {
+      _factureEnCours!.client.target = null;
+    }
     notifyListeners();
   }
 
-  Future<void> createAndSelectClient(
-      String nom,
-      String phone,
-      String adresse,
-      String description,
-      DateTime dateCreation,
+  // Méthode pour créer un nouveau client
+  Future<void> createClient(String nom, String phone, String adresse, String qr,
       DateTime derniereModification) async {
-    final newClient = Client(
-      qr: await generateQRCode('${_selectedClient!.id}'),
+    final nouveauClient = Client(
       nom: nom,
       phone: phone,
       adresse: adresse,
-      description: description,
-      derniereModification: DateTime.now(),
+      qr: qr,
+      derniereModification: derniereModification,
     );
-    _objectBox.clientBox.put(newClient);
-    selectClient(newClient);
+    _objectBox.clientBox.put(nouveauClient);
+    notifyListeners();
   }
 
-  void addToCart(Produit produit) {
-    final index = _facture.lignesDocument
-        .indexWhere((item) => item.produit.target!.id == produit.id);
-    if (index != -1) {
-      _facture.lignesDocument[index].quantite += 1;
+  // Méthode pour récupérer tous les clients
+  List<Client> getClients() {
+    return _objectBox.clientBox.getAll();
+  }
+
+  void _chargerFactures() {
+    _factures = _objectBox.factureBox.getAll();
+    notifyListeners();
+  }
+
+  void marquerCommeSauvegardee(Document facture) {
+    _factureEnEdition = null; // Réinitialiser la facture en cours d'édition
+    notifyListeners();
+  }
+
+  // Méthode pour vérifier si une facture est en cours d'édition
+  bool estEnEdition(Document facture) {
+    return _factureEnEdition?.id == facture.id;
+  }
+
+  // Méthode pour commencer l'édition d'une facture
+  void commencerEdition(Document facture) {
+    _factureEnEdition = facture;
+
+    notifyListeners();
+  }
+
+  LigneEditionState getLigneEditionState(int index) {
+    _ligneEditionStates.putIfAbsent(index, () => LigneEditionState());
+    return _ligneEditionStates[index]!;
+  }
+
+  void toggleEditQty(int index) {
+    final state = getLigneEditionState(index);
+    state.isEditedQty = !state.isEditedQty;
+    notifyListeners();
+  }
+
+  void toggleEditPu(int index) {
+    final state = getLigneEditionState(index);
+    state.isEditedPu = !state.isEditedPu;
+    notifyListeners();
+  }
+
+  void rechercherProduits(String texte) {
+    if (texte.isEmpty) {
+      _produitsTrouves.clear();
     } else {
-      final ligneFacture = LigneDocument(
-        quantite: 1,
-        prixUnitaire: produit.prixVente,
+      final query = _objectBox.produitBox.query(
+        Produit_.nom.contains(texte, caseSensitive: false) |
+            Produit_.qr.contains(texte, caseSensitive: false) |
+            Produit_.id.equals(int.tryParse(texte) ?? 0),
+      );
+      _produitsTrouves = query.build().find();
+    }
+    notifyListeners();
+  }
+
+  void ajouterProduitALaFacture(
+      Produit produit, double quantite, double prixUnitaire) {
+    // Vérifier si le produit existe déjà dans la facture
+    final ligneExistanteIndex = _lignesFacture.indexWhere(
+      (ligne) => ligne.produit.target?.id == produit.id,
+    );
+
+    if (ligneExistanteIndex != -1) {
+      // Si le produit existe, incrémenter la quantité
+      _lignesFacture[ligneExistanteIndex].quantite += quantite;
+    } else {
+      // Sinon, ajouter une nouvelle ligne
+      final nouvelleLigne = LigneDocument(
+        quantite: quantite,
+        prixUnitaire: prixUnitaire,
         derniereModification: DateTime.now(),
       );
-      ligneFacture.produit.target = produit;
-      ligneFacture.facture.target = _facture;
-      _facture.lignesDocument.add(ligneFacture);
+      nouvelleLigne.produit.target = produit;
+      _lignesFacture.add(nouvelleLigne);
     }
+
     notifyListeners();
   }
 
-  void removeFromCart(Produit produit) {
-    final index = _facture.lignesDocument
-        .indexWhere((item) => item.produit.target!.id == produit.id);
-    if (index != -1) {
-      if (_facture.lignesDocument[index].quantite > 1) {
-        _facture.lignesDocument[index].quantite -= 1;
-      } else {
-        _facture.lignesDocument.removeAt(index);
-      }
+  void modifierLigne(int index, double quantite, double prixUnitaire) {
+    if (index >= 0 && index < _lignesFacture.length) {
+      _lignesFacture[index].quantite = quantite;
+      _lignesFacture[index].prixUnitaire = prixUnitaire;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
-  double get totalAmount {
-    return _facture.lignesDocument
-        .fold(0, (sum, item) => sum + item.prixUnitaire * item.quantite);
+  void supprimerLigne(int index) {
+    if (index >= 0 && index < _lignesFacture.length) {
+      print('Suppression de la ligne à l\'index $index'); // Ajoutez ce log
+      _lignesFacture.removeAt(index);
+      notifyListeners();
+    } else {
+      print('Erreur : Index invalide pour la suppression'); // Ajoutez ce log
+    }
   }
 
-  Map<String, dynamic> calculateTotalsForInterval(
-      DateTime startDate, DateTime endDate) {
-    double totalTTC = 0.0;
-    double totalImpayes = 0.0;
-    double totalTVA = 0.0;
-    const double tvaRate = 0.19; // Taux de TVA (20% par exemple)
-
-    List<Document> facturesDansIntervalle =
-        _objectBox.factureBox.getAll().where((facture) {
-      return (facture.date.isAfter(startDate) &&
-              facture.date.isBefore(endDate)) ||
-          facture.date.isAtSameMomentAs(startDate) ||
-          facture.date.isAtSameMomentAs(endDate);
-    }).toList();
-
-    for (var facture in facturesDansIntervalle) {
-      double montantHT = facture.lignesDocument.fold(0.0, (sum, ligne) {
-        return sum + (ligne.prixUnitaire * ligne.quantite);
-      });
-
-      double tva = montantHT * tvaRate;
-      double montantTTC = montantHT + tva;
-
-      totalTTC += montantTTC;
-      totalTVA += tva;
-
-      totalImpayes += facture.impayer ?? 0.0;
-    }
-
-    return {
-      'totalTTC': totalTTC,
-      'totalImpayes': totalImpayes,
-      'totalTVA': totalTVA,
-    };
+  double calculerTotalHT() {
+    return _lignesFacture.fold(0.0, (total, ligne) {
+      return total + (ligne.quantite * ligne.prixUnitaire);
+    });
   }
 
-  Future<void> saveFacture(CommerceProvider1 commerceProvider1) async {
-    if (_selectedClient != null) {
-      _objectBox.clientBox.put(_selectedClient!);
-      _facture.client.target = _selectedClient;
-    }
+  double calculerTVA() {
+    const tauxTVA = 0.20;
+    return calculerTotalHT() * tauxTVA;
+  }
 
-    _facture.qrReference =
-        await generateQRCode('${_facture.id} ${_facture.date}');
+  double calculerTotalTTC() {
+    return calculerTotalHT() + calculerTVA();
+  }
 
-    _objectBox.factureBox.put(_facture);
-
-    for (var ligne in _facture.lignesDocument) {
-      final produit = ligne.produit.target;
-      if (produit != null) {
-        await commerceProvider1.updateProduitStock(produit, ligne.quantite);
-      }
-      _objectBox.ligneFacture.put(ligne);
-    }
-
-    _facture = Document(
-      date: DateTime.now(),
-      qrReference: '',
+  void creerNouvelleFacture() {
+    // Créer une nouvelle facture
+    _factureEnCours = Document(
+      type: 'vente',
+      // ou 'achat'
+      qrReference: 'REF${DateTime.now().millisecondsSinceEpoch}',
+      // Référence unique
       impayer: 0.0,
       derniereModification: DateTime.now(),
-      type: '',
-    );
-    _selectedClient = null;
-
-    notifyListeners();
-
-    fetchFactures();
-  }
-
-  void clearCart() {
-    _facture = Document(
+      isSynced: false,
       date: DateTime.now(),
-      qrReference: '',
-      impayer: 0.0,
-      derniereModification: DateTime.now(),
-      type: '',
     );
-    _selectedClient = null;
+
+    // Réinitialiser les lignes de la facture
+    _lignesFacture.clear();
+
+    // Notifier les listeners pour mettre à jour l'interface utilisateur
     notifyListeners();
   }
 
-  Future<String> generateQRCode(gRGenerated) async {
-    return "QR_${gRGenerated}";
+  // void selectionnerFacture(Document facture) {
+  //   _factureEnCours = facture;
+  //   _lignesFacture = facture.lignesDocument.toList();
+  //   notifyListeners();
+  // }
+
+  // void selectionnerFacture(Document facture) {
+  //   // Créer une copie manuelle de la facture
+  //   _factureEnEdition = Document(
+  //     id: facture.id,
+  //     type: facture.type,
+  //     qrReference: facture.qrReference,
+  //     impayer: facture.impayer,
+  //     derniereModification: facture.derniereModification,
+  //     isSynced: facture.isSynced,
+  //     syncedAt: facture.syncedAt,
+  //     date: facture.date,
+  //   );
+  //
+  //   // Copier les lignes de document
+  //   _factureEnEdition!.lignesDocument
+  //       .addAll(facture.lignesDocument.map((ligne) {
+  //     return LigneDocument(
+  //       id: ligne.id,
+  //       quantite: ligne.quantite,
+  //       prixUnitaire: ligne.prixUnitaire,
+  //       derniereModification: ligne.derniereModification,
+  //       isSynced: ligne.isSynced,
+  //       syncedAt: ligne.syncedAt,
+  //     )..produit.target = ligne.produit.target;
+  //   }));
+  //
+  //   _factureEnCours = facture;
+  //   _lignesFacture = _factureEnEdition!.lignesDocument.toList();
+  //   notifyListeners();
+  // }
+  void selectionnerFacture(Document facture) {
+    _factureEnEdition = Document(
+      id: facture.id,
+      type: facture.type,
+      qrReference: facture.qrReference,
+      impayer: facture.impayer ?? 0.0,
+      // Copiez l'impayé
+      derniereModification: facture.derniereModification,
+      isSynced: facture.isSynced,
+      syncedAt: facture.syncedAt,
+      date: facture.date,
+    );
+
+    // Copiez les lignes de document
+    _factureEnEdition!.lignesDocument
+        .addAll(facture.lignesDocument.map((ligne) {
+      return LigneDocument(
+        id: ligne.id,
+        quantite: ligne.quantite,
+        prixUnitaire: ligne.prixUnitaire,
+        derniereModification: ligne.derniereModification,
+        isSynced: ligne.isSynced,
+        syncedAt: ligne.syncedAt,
+      )..produit.target = ligne.produit.target;
+    }));
+
+    _factureEnCours = facture;
+    _lignesFacture = _factureEnEdition!.lignesDocument.toList();
+    _impayer = facture.impayer ?? 0.0; // Initialisez l'impayé
+    notifyListeners();
   }
 
-  Future<void> deleteFacture(Document facture) async {
+  // Future<void> sauvegarderFacture() async {
+  //   print('Sauvegarde de la facture en cours...');
+  //
+  //   if (_factureEnCours == null) {
+  //     print('Création d\'une nouvelle facture');
+  //     final nouvelleFacture = Document(
+  //       type: 'vente',
+  //       qrReference: 'REF${DateTime.now().millisecondsSinceEpoch}',
+  //       impayer: 0.0,
+  //       derniereModification: DateTime.now(),
+  //       isSynced: false,
+  //       date: DateTime.now(),
+  //     );
+  //
+  //     nouvelleFacture.lignesDocument.addAll(_lignesFacture);
+  //     _objectBox.factureBox.put(nouvelleFacture);
+  //
+  //     for (final ligne in _lignesFacture) {
+  //       ligne.facture.target = nouvelleFacture;
+  //       _objectBox.ligneFacture.put(ligne);
+  //     }
+  //
+  //     _factures.add(nouvelleFacture);
+  //   } else {
+  //     _factureEnCours!.lignesDocument.clear();
+  //     _factureEnCours!.lignesDocument.addAll(_lignesFacture);
+  //     _objectBox.factureBox.put(_factureEnCours!);
+  //
+  //     for (final ligne in _lignesFacture) {
+  //       ligne.facture.target = _factureEnCours;
+  //       _objectBox.ligneFacture.put(ligne);
+  //     }
+  //   }
+  //
+  //   _factureEnCours = null;
+  //   _lignesFacture.clear();
+  //   _chargerFactures();
+  //
+  //   print('Facture sauvegardée avec succès');
+  // }
+  Future<void> sauvegarderFacture() async {
+    print('Sauvegarde de la facture en cours...');
+
+    if (_factureEnCours == null) {
+      print('Création d\'une nouvelle facture');
+      final nouvelleFacture = Document(
+        type: 'vente',
+        qrReference: 'REF${DateTime.now().millisecondsSinceEpoch}',
+        impayer: _impayer,
+        // Ajoutez l'impayé
+        derniereModification: DateTime.now(),
+        isSynced: false,
+        date: DateTime.now(),
+      );
+
+      nouvelleFacture.lignesDocument.addAll(_lignesFacture);
+      _objectBox.factureBox.put(nouvelleFacture);
+
+      for (final ligne in _lignesFacture) {
+        ligne.facture.target = nouvelleFacture;
+        _objectBox.ligneFacture.put(ligne);
+      }
+
+      _factures.add(nouvelleFacture);
+    } else {
+      _factureEnCours!.lignesDocument.clear();
+      _factureEnCours!.lignesDocument.addAll(_lignesFacture);
+      _factureEnCours!.impayer = _impayer; // Mettez à jour l'impayé
+      _objectBox.factureBox.put(_factureEnCours!);
+
+      for (final ligne in _lignesFacture) {
+        ligne.facture.target = _factureEnCours;
+        _objectBox.ligneFacture.put(ligne);
+      }
+    }
+
+    _factureEnCours = null;
+    _lignesFacture.clear();
+    _impayer = 0.0; // Réinitialisez l'impayé
+    _chargerFactures();
+
+    print('Facture sauvegardée avec succès');
+  }
+
+  Future<void> supprimerFacture(Document facture) async {
+    // Supprimer la facture de la base de données
     _objectBox.factureBox.remove(facture.id);
-    notifyListeners();
-    fetchFactures();
-  }
 
-  void loadFactureForEditing(Document facture) {
-    _facture = facture;
-    notifyListeners();
-  }
-
-  Future<void> updateFacture(int factureId) async {
-    final existingFacture = _factures.firstWhere((f) => f.id == factureId);
-    existingFacture.lignesDocument.clear();
-    for (var ligne in _facture.lignesDocument) {
-      existingFacture.lignesDocument.add(ligne);
+    // Supprimer les lignes de document associées
+    for (final ligne in facture.lignesDocument) {
+      _objectBox.ligneFacture.remove(ligne.id);
     }
-    existingFacture.impayer = _facture.impayer;
-    existingFacture.date = DateTime.now();
-    await _objectBox.factureBox.put(existingFacture);
+
+    // Mettre à jour la liste des factures
+    _factures.remove(facture);
+
+    // Si la facture supprimée est la facture en cours, la réinitialiser
+    if (_factureEnCours?.id == facture.id) {
+      _factureEnCours = null;
+      _lignesFacture.clear();
+    }
+
+    // Notifier les listeners pour mettre à jour l'interface utilisateur
     notifyListeners();
   }
+}
 
-  Future<void> deleteAllFactures() async {
-    final box = _objectBox.factureBox;
-    box.removeAll();
-    fetchFactures();
-  }
+class LigneEditionState {
+  bool isEditedQty = false;
+  bool isEditedPu = false;
 }

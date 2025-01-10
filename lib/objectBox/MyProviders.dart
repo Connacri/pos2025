@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:faker/faker.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -702,8 +703,10 @@ class CartProvider with ChangeNotifier {
     derniereModification: DateTime.now(),
     type: '',
   );
+
   Client? _selectedClient;
   List<Document> _factures = [];
+
   Produit? produit;
 
   Document get facture => _facture;
@@ -718,14 +721,23 @@ class CartProvider with ChangeNotifier {
     fetchFactures();
   }
 
-  void selectFacture(Document facture) {
-    _facture = facture;
-    notifyListeners();
-  }
-
   void fetchFactures() {
     _factures = _objectBox.factureBox.getAll();
     notifyListeners();
+  }
+
+  // Méthode pour la sélection d'une facture
+  void selectFacture(Document facture) {
+    _facture = facture; // Clonage ou copie indépendante
+    notifyListeners();
+  }
+
+  // Méthode pour filtrer ou rechercher une facture
+  List<Document> searchFactures(String keyword) {
+    return _factures
+        .where(
+            (f) => f.qrReference.contains(keyword) || f.type.contains(keyword))
+        .toList();
   }
 
   void updateImpayer(double newImpayer) {
@@ -740,13 +752,14 @@ class CartProvider with ChangeNotifier {
 
   void selectClient(Client client) {
     _selectedClient = client;
-    _facture.client.target = client;
+    //_facture.client.target = client;
     notifyListeners();
   }
 
   void resetClient() {
     _selectedClient = null;
-    notifyListeners();
+    _facture.client.target = null;
+    // notifyListeners();
   }
 
   Future<void> createAndSelectClient(
@@ -757,14 +770,14 @@ class CartProvider with ChangeNotifier {
       DateTime dateCreation,
       DateTime derniereModification) async {
     final newClient = Client(
-      qr: await generateQRCode('${_selectedClient!.id}'),
+      qr: await generateQRCode('${_selectedClient?.id ?? ''}'),
       nom: nom,
       phone: phone,
       adresse: adresse,
       description: description,
       derniereModification: DateTime.now(),
     );
-    _objectBox.clientBox.put(newClient);
+    //_objectBox.clientBox.put(newClient);
     selectClient(newClient);
   }
 
@@ -795,7 +808,7 @@ class CartProvider with ChangeNotifier {
       anonymousClient.crud.target = crud;
 
       // Sauvegarder le client avec l'entité Crud
-      _objectBox.clientBox.put(anonymousClient);
+      // _objectBox.clientBox.put(anonymousClient);
 
       // Sélectionner le client anonyme comme client courant
       selectClient(anonymousClient);
@@ -817,7 +830,6 @@ class CartProvider with ChangeNotifier {
       ligneFacture.facture.target = _facture;
       _facture.lignesDocument.add(ligneFacture);
     }
-    notifyListeners();
   }
 
   void removeFromCart(Produit produit) {
@@ -830,7 +842,6 @@ class CartProvider with ChangeNotifier {
         _facture.lignesDocument.removeAt(index);
       }
     }
-    notifyListeners();
   }
 
   double get totalAmount {
@@ -962,17 +973,54 @@ class CartProvider with ChangeNotifier {
   //   notifyListeners();
   //   fetchFactures();
   // }
+  // void loadFactureForEditing(Document facture) {
+  //   // Copier les lignes de la facture dans le panier actuel
+  //   _facture.lignesDocument.clear();
+  //   for (var ligne in facture.lignesDocument) {
+  //     _facture.lignesDocument.add(ligne);
+  //   }
+  //
+  //   // Copier les autres propriétés de la facture
+  //   // _facture.impayer =  facture.impayer;
+  //   // _facture.date=facture.date;
+  //
+  //   notifyListeners();
+  // }
   void loadFactureForEditing(Document facture) {
-    // Copier les lignes de la facture dans le panier actuel
+    // Réinitialiser complètement l'instance actuelle de Document
+    _facture = Document(
+      id: 0,
+      // Réinitialiser l'ID pour éviter d'écraser une facture existante
+      date: facture.date,
+      qrReference: facture.qrReference,
+      type: facture.type,
+      montantVerse: facture.montantVerse,
+      impayer: facture.impayer,
+      derniereModification: facture.derniereModification,
+      isSynced: facture.isSynced,
+      syncedAt: facture.syncedAt,
+    );
+
+    // Copier les relations spécifiques
+    _facture.client.target = facture.client.target;
+    _facture.fournisseur.target = facture.fournisseur.target;
+    _facture.crud.target = facture.crud.target;
+
+    // Réinitialiser les lignes de document
     _facture.lignesDocument.clear();
     for (var ligne in facture.lignesDocument) {
-      _facture.lignesDocument.add(ligne);
+      _facture.lignesDocument.add(LigneDocument(
+        id: 0,
+        // Réinitialisation pour garantir une modification locale
+        quantite: ligne.quantite,
+        prixUnitaire: ligne.prixUnitaire,
+        derniereModification: ligne.derniereModification,
+        isSynced: ligne.isSynced,
+        syncedAt: ligne.syncedAt,
+      )..produit.target = ligne.produit.target); // Copie de la relation produit
     }
 
-    // Copier les autres propriétés de la facture
-    // _facture.impayer = facture.impayer;
-    // _facture.date = facture.date;
-
+    // Notifier les auditeurs pour mettre à jour l'interface
     notifyListeners();
   }
 
