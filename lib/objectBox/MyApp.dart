@@ -27,6 +27,7 @@ import 'pages/ProduitListScreen.dart';
 import 'pages/facturation/FacturePage.dart';
 import 'pages/facturation/FacturesListPage.dart';
 import 'pages/invoice/FacturationPageUI.dart';
+
 import 'pages/invoice/providers.dart';
 import 'tests/hotelScreenFiable.dart';
 
@@ -70,23 +71,14 @@ class MyApp9 extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CrudProvider(objectBox)),
-        ChangeNotifierProvider(
-          create: (_) => CommerceProvider(
-            objectBox,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => CartProvider(objectBox),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ClientProvider(objectBox),
-        ),
+        ChangeNotifierProvider(create: (_) => CommerceProvider(objectBox)),
+        ChangeNotifierProvider(create: (_) => CartProvider(objectBox)),
+        ChangeNotifierProvider(create: (_) => ClientProvider(objectBox)),
         ChangeNotifierProvider(create: (_) => AdProvider()),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider(),
-        ),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
 //////////////////////////////////////////////////////////////////
         ChangeNotifierProvider(create: (_) => FacturationProvider()),
+        ChangeNotifierProvider(create: (_) => EditableFieldProvider()),
       ],
       child: Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
         return MaterialApp(

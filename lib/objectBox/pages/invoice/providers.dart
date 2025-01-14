@@ -11,6 +11,13 @@ class FacturationProvider with ChangeNotifier {
   List<LigneDocument> _lignesFacture = [];
   List<Produit> _produitsTrouves = [];
   final Map<int, LigneEditionState> _ligneEditionStates = {};
+  bool _isEditing =
+      false; // Pour suivre si une facture est en cours de modification
+  bool get isEditing => _isEditing;
+  bool _hasChanges =
+      false; // Pour suivre si des modifications ont été apportées
+
+  bool get hasChanges => _hasChanges;
 
   Document? get factureEnEdition => _factureEnEdition;
 
@@ -21,7 +28,8 @@ class FacturationProvider with ChangeNotifier {
   List<LigneDocument> get lignesFacture => _lignesFacture;
 
   List<Produit> get produitsTrouves => _produitsTrouves;
-  Client? _clientSelectionne;
+
+  Client? _clientTemporaire; // Client temporaire
 
   final ObjectBox _objectBox = ObjectBox();
 
@@ -42,23 +50,52 @@ class FacturationProvider with ChangeNotifier {
 
   void setImpayer(double value) {
     _impayer = value;
-    // notifyListeners();
+    // _isEditing = true;
+    _hasChanges = true;
+    notifyListeners();
+  }
+
+  void commencerEdition(Document facture) {
+    _factureEnEdition = facture;
+    _isEditing = true; // Activer l'état d'édition
+    _hasChanges = false; // Réinitialiser l'état des modifications
+    notifyListeners();
+  }
+
+  void modifierLigne(int index, double quantite, double prixUnitaire) {
+    if (index >= 0 && index < _lignesFacture.length) {
+      _lignesFacture[index].quantite = quantite;
+      _lignesFacture[index].prixUnitaire = prixUnitaire;
+      _hasChanges = true; // Marquer qu'il y a des modifications
+      notifyListeners();
+    }
+  }
+
+  void modifierImpayer(double impayer) {
+    _impayer = impayer;
+    _hasChanges = true; // Marquer qu'il y a des modifications
+    notifyListeners();
   }
 
   void selectClient(Client client) {
     _selectedClient = client;
-    if (_factureEnEdition != null) {
-      _factureEnEdition!.client.target = client;
-    }
+    // if (_factureEnEdition != null) {
+    //   _factureEnEdition!.client.target = client;
+    // }
+    _hasChanges = true;
+
     notifyListeners();
   }
 
-  // Méthode pour réinitialiser le client sélectionné
   void resetClient() {
+    // Déconnecter temporairement le client uniquement pour la facture en cours
+    // if (_factureEnCours != null) {
+    //   _factureEnCours!.client.target = null;
+    // }
+
+    // Ne réinitialise que le client sélectionné dans l'état local
     _selectedClient = null;
-    if (_factureEnCours != null) {
-      _factureEnCours!.client.target = null;
-    }
+    _hasChanges = true;
     notifyListeners();
   }
 
@@ -96,13 +133,6 @@ class FacturationProvider with ChangeNotifier {
     return _factureEnEdition?.id == facture.id;
   }
 
-  // Méthode pour commencer l'édition d'une facture
-  void commencerEdition(Document facture) {
-    _factureEnEdition = facture;
-
-    notifyListeners();
-  }
-
   LigneEditionState getLigneEditionState(int index) {
     _ligneEditionStates.putIfAbsent(index, () => LigneEditionState());
     return _ligneEditionStates[index]!;
@@ -117,6 +147,26 @@ class FacturationProvider with ChangeNotifier {
   void toggleEditPu(int index) {
     final state = getLigneEditionState(index);
     state.isEditedPu = !state.isEditedPu;
+    notifyListeners();
+  }
+
+  void AlwaystoggleEdit(int index) {
+    final state = LigneEditionState();
+    state.isEditedPu = !state.isEditedPu;
+    notifyListeners();
+  }
+
+  bool _isEditable = false;
+
+  bool get isEditable => _isEditable;
+
+  void toggleEditImpayer() {
+    _isEditable = !_isEditable;
+    notifyListeners();
+  }
+
+  void setEditable(bool value) {
+    _isEditable = value;
     notifyListeners();
   }
 
@@ -158,18 +208,11 @@ class FacturationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void modifierLigne(int index, double quantite, double prixUnitaire) {
-    if (index >= 0 && index < _lignesFacture.length) {
-      _lignesFacture[index].quantite = quantite;
-      _lignesFacture[index].prixUnitaire = prixUnitaire;
-      notifyListeners();
-    }
-  }
-
   void supprimerLigne(int index) {
     if (index >= 0 && index < _lignesFacture.length) {
       print('Suppression de la ligne à l\'index $index'); // Ajoutez ce log
       _lignesFacture.removeAt(index);
+      _hasChanges = true; // Marquer qu'il y a des modifications
       notifyListeners();
     } else {
       print('Erreur : Index invalide pour la suppression'); // Ajoutez ce log
@@ -203,7 +246,8 @@ class FacturationProvider with ChangeNotifier {
       isSynced: false,
       date: DateTime.now(),
     );
-
+    _selectedClient = null;
+    _impayer = 0.0;
     // Réinitialiser les lignes de la facture
     _lignesFacture.clear();
 
@@ -211,42 +255,6 @@ class FacturationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // void selectionnerFacture(Document facture) {
-  //   _factureEnCours = facture;
-  //   _lignesFacture = facture.lignesDocument.toList();
-  //   notifyListeners();
-  // }
-
-  // void selectionnerFacture(Document facture) {
-  //   // Créer une copie manuelle de la facture
-  //   _factureEnEdition = Document(
-  //     id: facture.id,
-  //     type: facture.type,
-  //     qrReference: facture.qrReference,
-  //     impayer: facture.impayer,
-  //     derniereModification: facture.derniereModification,
-  //     isSynced: facture.isSynced,
-  //     syncedAt: facture.syncedAt,
-  //     date: facture.date,
-  //   );
-  //
-  //   // Copier les lignes de document
-  //   _factureEnEdition!.lignesDocument
-  //       .addAll(facture.lignesDocument.map((ligne) {
-  //     return LigneDocument(
-  //       id: ligne.id,
-  //       quantite: ligne.quantite,
-  //       prixUnitaire: ligne.prixUnitaire,
-  //       derniereModification: ligne.derniereModification,
-  //       isSynced: ligne.isSynced,
-  //       syncedAt: ligne.syncedAt,
-  //     )..produit.target = ligne.produit.target;
-  //   }));
-  //
-  //   _factureEnCours = facture;
-  //   _lignesFacture = _factureEnEdition!.lignesDocument.toList();
-  //   notifyListeners();
-  // }
   void selectionnerFacture(Document facture) {
     _factureEnEdition = Document(
       id: facture.id,
@@ -259,7 +267,8 @@ class FacturationProvider with ChangeNotifier {
       syncedAt: facture.syncedAt,
       date: facture.date,
     );
-
+    // Copier le client associé à la facture
+    _selectedClient = facture.client.target;
     // Copiez les lignes de document
     _factureEnEdition!.lignesDocument
         .addAll(facture.lignesDocument.map((ligne) {
@@ -279,88 +288,81 @@ class FacturationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> sauvegarderFacture() async {
-  //   print('Sauvegarde de la facture en cours...');
-  //
-  //   if (_factureEnCours == null) {
-  //     print('Création d\'une nouvelle facture');
-  //     final nouvelleFacture = Document(
-  //       type: 'vente',
-  //       qrReference: 'REF${DateTime.now().millisecondsSinceEpoch}',
-  //       impayer: 0.0,
-  //       derniereModification: DateTime.now(),
-  //       isSynced: false,
-  //       date: DateTime.now(),
-  //     );
-  //
-  //     nouvelleFacture.lignesDocument.addAll(_lignesFacture);
-  //     _objectBox.factureBox.put(nouvelleFacture);
-  //
-  //     for (final ligne in _lignesFacture) {
-  //       ligne.facture.target = nouvelleFacture;
-  //       _objectBox.ligneFacture.put(ligne);
-  //     }
-  //
-  //     _factures.add(nouvelleFacture);
-  //   } else {
-  //     _factureEnCours!.lignesDocument.clear();
-  //     _factureEnCours!.lignesDocument.addAll(_lignesFacture);
-  //     _objectBox.factureBox.put(_factureEnCours!);
-  //
-  //     for (final ligne in _lignesFacture) {
-  //       ligne.facture.target = _factureEnCours;
-  //       _objectBox.ligneFacture.put(ligne);
-  //     }
-  //   }
-  //
-  //   _factureEnCours = null;
-  //   _lignesFacture.clear();
-  //   _chargerFactures();
-  //
-  //   print('Facture sauvegardée avec succès');
-  // }
   Future<void> sauvegarderFacture() async {
     print('Sauvegarde de la facture en cours...');
 
-    if (_factureEnCours == null) {
-      print('Création d\'une nouvelle facture');
-      final nouvelleFacture = Document(
-        type: 'vente',
-        qrReference: 'REF${DateTime.now().millisecondsSinceEpoch}',
-        impayer: _impayer,
-        // Ajoutez l'impayé
-        derniereModification: DateTime.now(),
-        isSynced: false,
-        date: DateTime.now(),
-      );
+    try {
+      if (_factureEnCours == null) {
+        print('Création d\'une nouvelle facture');
+        final nouvelleFacture = Document(
+          type: 'vente',
+          qrReference: 'REF${DateTime.now().millisecondsSinceEpoch}',
+          impayer: _impayer,
+          derniereModification: DateTime.now(),
+          isSynced: false,
+          date: DateTime.now(),
+        );
 
-      nouvelleFacture.lignesDocument.addAll(_lignesFacture);
-      _objectBox.factureBox.put(nouvelleFacture);
+        // Associer le client sélectionné à la nouvelle facture
+        //  if (_selectedClient != null) {
+        nouvelleFacture.client.target = _selectedClient;
+        // }
 
-      for (final ligne in _lignesFacture) {
-        ligne.facture.target = nouvelleFacture;
-        _objectBox.ligneFacture.put(ligne);
+        // Ajouter les lignes de document à la nouvelle facture
+        nouvelleFacture.lignesDocument.addAll(_lignesFacture);
+
+        // Sauvegarder la nouvelle facture dans la base de données
+        _objectBox.factureBox.put(nouvelleFacture);
+
+        // Sauvegarder les lignes de document
+        for (final ligne in _lignesFacture) {
+          ligne.facture.target = nouvelleFacture;
+          _objectBox.ligneFacture.put(ligne);
+        }
+
+        // Ajouter la nouvelle facture à la liste des factures
+        _factures.add(nouvelleFacture);
+      } else {
+        // Mettre à jour la facture existante
+        _factureEnCours!.lignesDocument.clear();
+        _factureEnCours!.lignesDocument.addAll(_lignesFacture);
+        _factureEnCours!.impayer = _impayer;
+
+        // Associer le client sélectionné à la facture existante
+        // if (_selectedClient != null) {
+        _factureEnCours!.client.target = _selectedClient;
+        //  }
+
+        // Sauvegarder la facture mise à jour dans la base de données
+        _objectBox.factureBox.put(_factureEnCours!);
+
+        // Sauvegarder les lignes de document
+        for (final ligne in _lignesFacture) {
+          ligne.facture.target = _factureEnCours;
+          _objectBox.ligneFacture.put(ligne);
+        }
       }
 
-      _factures.add(nouvelleFacture);
-    } else {
-      _factureEnCours!.lignesDocument.clear();
-      _factureEnCours!.lignesDocument.addAll(_lignesFacture);
-      _factureEnCours!.impayer = _impayer; // Mettez à jour l'impayé
-      _objectBox.factureBox.put(_factureEnCours!);
+      // Réinitialiser l'état après la sauvegarde
+      _factureEnCours = null;
+      _lignesFacture.clear();
+      _impayer = 0.0;
+      _selectedClient = null; // Réinitialiser le client sélectionné
+      _chargerFactures();
 
-      for (final ligne in _lignesFacture) {
-        ligne.facture.target = _factureEnCours;
-        _objectBox.ligneFacture.put(ligne);
-      }
+      print('Facture sauvegardée avec succès');
+      _isEditing = false; // Désactiver l'état d'édition après la sauvegarde
+      _hasChanges = false; // Réinitialiser l'état des modifications
+      notifyListeners();
+    } catch (e) {
+      print('Erreur lors de la sauvegarde de la facture: $e');
     }
+  }
 
-    _factureEnCours = null;
-    _lignesFacture.clear();
-    _impayer = 0.0; // Réinitialisez l'impayé
-    _chargerFactures();
-
-    print('Facture sauvegardée avec succès');
+  void annulerEdition() {
+    _isEditing = false; // Désactiver l'état d'édition
+    _hasChanges = false; // Réinitialiser l'état des modifications
+    notifyListeners();
   }
 
   Future<void> supprimerFacture(Document facture) async {
@@ -388,5 +390,52 @@ class FacturationProvider with ChangeNotifier {
 
 class LigneEditionState {
   bool isEditedQty = false;
+  bool isEditedImpayer = false;
   bool isEditedPu = false;
+}
+
+class EditableFieldProvider with ChangeNotifier {
+  bool _isEditable = false;
+
+  bool get isEditable => _isEditable;
+
+  bool _hasChanges = false;
+
+  bool get hasChanges => _hasChanges;
+
+//   bool _hasChanges =
+//       false; // Pour suivre si des modifications ont été apportées
+//
+//   bool get hasChanges => _hasChanges;
+//
+// // Ajoutez un champ pour gérer l'impayé
+//   double _impayer = 0.0;
+//
+//   double get impayer => _impayer;
+//
+//   void setImpayer(double value) {
+//     _impayer = value;
+//     // _isEditing = true;
+//     _hasChanges = true;
+//     notifyListeners();
+//   }
+  void AlwaystoggleEditable() {
+    _isEditable = false;
+    print('isEditable: $_isEditable'); // Ajout de log
+    notifyListeners();
+  }
+
+  void toggleEditable() {
+    _isEditable = !_isEditable;
+    print('isEditable: $_isEditable'); // Ajout de log
+    notifyListeners();
+  }
+//
+// void modifierImpayer(double impayer) {
+//   if (_impayer != impayer) {
+//     _impayer = impayer;
+//     _hasChanges = true;
+//     notifyListeners();
+//   }
+// }
 }
