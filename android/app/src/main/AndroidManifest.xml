@@ -5,49 +5,53 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Déclarez la caméra comme fonctionnalité optionnelle -->
-    <uses-feature android:name="android.hardware.camera" required="false"
+    <uses-feature
+        android:name="android.hardware.camera"
+        required="false"
         tools:ignore="MissingPrefix" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <!-- Required to provide the web interface -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Required to run keep-alive service when targeting API 28 or higher -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- When targeting API level 33 or higher to post the initial Admin notification -->
-<!--    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>-->
+    <!--    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
     <application
-        android:label="kenzy"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:label="kenzy">
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
+            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:taskAffinity="${applicationId}"
             android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
 
             <!-- Ajoutez ces métadonnées -->
             <meta-data
                 android:name="io.flutter.embedding.android.EnableImpeller"
                 android:value="true" />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
@@ -57,7 +61,7 @@
             android:value="2" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2282149611905342~2957460195"/>
+            android:value="ca-app-pub-2282149611905342~2957460195" />
     </application>
     <queries>
         <!-- If your app checks for SMS support -->
@@ -75,6 +79,9 @@
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
         </intent>
+
+        <!--        <package android:name="com.zhiliaoapp.musically" />-->
+        <!--        <package android:name="com.ss.android.ugc.trill" />-->
     </queries>
 
 </manifest>

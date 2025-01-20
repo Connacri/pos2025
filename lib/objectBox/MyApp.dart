@@ -12,6 +12,7 @@ import '../objectBox/pages/ClientListScreen.dart';
 import '../objectBox/tests/cruds.dart' as cruds;
 import '../../MyListLotties.dart';
 import '../objectbox.g.dart';
+import '../vids/VideoPlayerScreen.dart';
 import 'Entity.dart';
 import 'MyProviders.dart';
 import 'Utils/excel.dart';
@@ -84,14 +85,28 @@ class MyApp9 extends StatelessWidget {
         return MaterialApp(
           title: 'POS',
           theme: ThemeData(
-            fontFamily: 'OSWALD',
+            fontFamily: 'oswald',
             brightness: Brightness.light,
             primarySwatch: Colors.blue,
             chipTheme: ChipThemeData(
               backgroundColor: Colors.grey[300]!,
               labelStyle: TextStyle(fontFamily: 'oswald'),
             ),
+            textTheme: TextTheme(
+              bodyMedium: TextStyle(color: Colors.black),
+              // Texte par défaut en noir
+              bodyLarge: TextStyle(color: Colors.black),
+              // Texte plus grand en noir
+              bodySmall: TextStyle(color: Colors.black),
+              // Texte plus petit en noir
+              titleMedium: TextStyle(color: Colors.black),
+              // Titres en noir
+              titleLarge: TextStyle(color: Colors.black),
+              // Titres plus grands en noir
+              labelLarge: TextStyle(color: Colors.black), // Labels en noir
+            ),
           ),
+
           darkTheme: ThemeData(
             fontFamily: 'oswald',
             brightness: Brightness.dark,
@@ -100,16 +115,25 @@ class MyApp9 extends StatelessWidget {
               backgroundColor: Colors.grey[800]!,
               labelStyle: TextStyle(fontFamily: 'oswald'),
             ),
+            textTheme: TextTheme(
+              bodyMedium: TextStyle(color: Colors.white),
+              // Texte en blanc pour le mode sombre
+              bodyLarge: TextStyle(color: Colors.white),
+              bodySmall: TextStyle(color: Colors.white),
+              titleMedium: TextStyle(color: Colors.white),
+              titleLarge: TextStyle(color: Colors.white),
+              labelLarge: TextStyle(color: Colors.white),
+            ),
           ),
           themeMode:
               themeProvider.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
 
           //darkTheme: ThemeData.dark(),
-
-          // home: /*showPlatform*/ adaptiveHome(
-          //   objectBox: objectBox,
-          // ),
-          home: FacturationPageUI(),
+          // home: Scaffold(body: FactureList()),
+          home: /*showPlatform*/ adaptiveHome(
+            objectBox: objectBox,
+          ),
+          //   home: FacturationPageUI(),
         );
       }),
     );
@@ -286,15 +310,17 @@ class _adaptiveHomeState extends State<adaptiveHome> {
 
   List<Widget> _widgetOptions() {
     return [
-      FacturesListPage(
-          // onFactureSelected: (facture) {
-          //   setState(() {
-          //     selectedFacture = facture;
-          //   });
-          // },
-          ),
-      Container(), //homeRail(),
-      Container(),
+      FactureList(),
+      // FacturesListPage(
+      //     // onFactureSelected: (facture) {
+      //     //   setState(() {
+      //     //     selectedFacture = facture;
+      //     //   });
+      //     // },
+      //     ),
+
+      Container(), Container(), //homeRail(),
+
       //FournisseurListScreen(),
     ];
   }
@@ -338,6 +364,14 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                 appBar: AppBar(
                   title: Text('POS'),
                   actions: [
+                    // IconButton(
+                    //   onPressed: () {
+                    //     Navigator.of(context).push(MaterialPageRoute(
+                    //         builder: (ctx) => VerticalVideoListScreen()));
+                    //   },
+                    //   icon: Icon(Icons.kayaking),
+                    // ),
+
                     WinMobile(),
                     // Switch(
                     //   value: isSwitchOn,
@@ -834,12 +868,12 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                               ),
                             ],
                           ),
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (_) => addProduct()));
-                              },
-                              child: Text('Add Product 2')),
+                          // ElevatedButton(
+                          //     onPressed: () {
+                          //       Navigator.of(context).push(MaterialPageRoute(
+                          //           builder: (_) => addProduct()));
+                          //     },
+                          //     child: Text('Add Product 2')),
                           // Padding(
                           //   padding: const EdgeInsets.symmetric(
                           //       horizontal: 8, vertical: 15),
@@ -908,62 +942,82 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                                   width: 1.0, // Épaisseur de la bordure
                                 ),
                               ),
-                              child: Column(
-                                children: [
-                                  Text('Factures'),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: ElevatedButton.icon(
-                                              onPressed: () =>
-                                                  showForcedRewardedAd(
-                                                      context, FacturePage()),
-                                              // onPressed: () {
-                                              //   Navigator.of(context).push(MaterialPageRoute(
-                                              //       builder: (_) => FacturePage()));
-                                              // },
-                                              label: Text(
-                                                'Ajouter',
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              icon: Icon(Icons.add)),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: ElevatedButton.icon(
-                                              onPressed: () =>
-                                                  showForcedRewardedAd(
-                                                    context,
-                                                    FacturesListPage(
-                                                        // onFactureSelected:
-                                                        //     (facture) {
-                                                        //   setState(() {
-                                                        //     selectedFacture =
-                                                        //         facture;
-                                                        //   });
-                                                        // },
-                                                        ),
-                                                  ),
-                                              // onPressed: () {
-                                              //   Navigator.of(context).push(MaterialPageRoute(
-                                              //       builder: (_) => FacturesListPage()));
-                                              // },
-                                              label: Text(
-                                                'List',
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              icon: Icon(Icons.list_alt)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton.icon(
+                                    onPressed: () => showForcedRewardedAd(
+                                        context, FacturationPageUI()),
+                                    // onPressed: () {
+                                    //   Navigator.of(context).push(MaterialPageRoute(
+                                    //       builder: (_) => FacturePage()));
+                                    // },
+                                    label: Text(
+                                      'Factures',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    icon: Icon(Icons.add)),
                               ),
+                              // Column(
+                              //   children: [
+                              //     Text('Factures'),
+                              //
+                              //
+                              //
+                              //     Row(
+                              //       mainAxisAlignment: MainAxisAlignment.center,
+                              //       children: [
+                              //         Expanded(
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(8.0),
+                              //             child: ElevatedButton.icon(
+                              //                 onPressed: () =>
+                              //                     showForcedRewardedAd(context,
+                              //                         FacturationPageUI()),
+                              //                 // onPressed: () {
+                              //                 //   Navigator.of(context).push(MaterialPageRoute(
+                              //                 //       builder: (_) => FacturePage()));
+                              //                 // },
+                              //                 label: Text(
+                              //                   'Ajouter',
+                              //                   overflow: TextOverflow.ellipsis,
+                              //                 ),
+                              //                 icon: Icon(Icons.add)),
+                              //           ),
+                              //         ),
+                              //
+                              //         Expanded(
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(8.0),
+                              //             child: ElevatedButton.icon(
+                              //                 onPressed: () =>
+                              //                     showForcedRewardedAd(
+                              //                       context,
+                              //                       FactureList(),
+                              //                       // FacturesListPage(
+                              //                       //     // onFactureSelected:
+                              //                       //     //     (facture) {
+                              //                       //     //   setState(() {
+                              //                       //     //     selectedFacture =
+                              //                       //     //         facture;
+                              //                       //     //   });
+                              //                       //     // },
+                              //                       //     ),
+                              //                     ),
+                              //                 // onPressed: () {
+                              //                 //   Navigator.of(context).push(MaterialPageRoute(
+                              //                 //       builder: (_) => FacturesListPage()));
+                              //                 // },
+                              //                 label: Text(
+                              //                   'List',
+                              //                   overflow: TextOverflow.ellipsis,
+                              //                 ),
+                              //                 icon: Icon(Icons.list_alt)),
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ],
+                              // ),
                             ),
                           ),
                           GestureDetector(
@@ -1153,7 +1207,13 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                 title: Text('POS Desktop'),
                 actions: [
                   WinMobile(),
-
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //         builder: (ctx) => VerticalVideoListScreen()));
+                  //   },
+                  //   icon: Icon(Icons.kayaking),
+                  // ),
                   // Switch(
                   //   value: isSwitchOn,
                   //   onChanged: _toggleWindowSize, // Bascule entre les modes
@@ -1330,7 +1390,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                         ],
                       ),
                       _selectedIndex == 0
-                          ? Expanded(flex: 5, child: FacturePage())
+                          ? Expanded(flex: 5, child: FactureDetail())
                           : _selectedIndex == 1
                               ? buildExpanded(context, randomId,
                                   produitProvider, produitsFiltres, roomNumbers

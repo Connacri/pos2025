@@ -345,7 +345,14 @@ class ObjectBox {
 
     // Créer des produits
     List<Produit> produits = List.generate(produitCount, (index) {
-      String uniqueQr = generateUniqueQr();
+      String uniqueQr;
+      do {
+        uniqueQr = generateUniqueQr();
+      } while (produitBox
+          .query(Produit_.qr.equals(uniqueQr))
+          .build()
+          .find()
+          .isNotEmpty);
 
       return Produit(
         image: 'https://picsum.photos/200/300?random=$index',

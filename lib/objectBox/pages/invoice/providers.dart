@@ -1,11 +1,15 @@
+import 'dart:isolate';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../objectbox.g.dart';
 import '../../Entity.dart';
 import '../../classeObjectBox.dart';
 
 class FacturationProvider with ChangeNotifier {
-  List<Document> _factures = [];
+  // List<Document> _factures = [];
   Document? _factureEnCours;
   Document? _factureEnEdition; // Copie de la facture en cours d'édition
   List<LigneDocument> _lignesFacture = [];
@@ -21,7 +25,7 @@ class FacturationProvider with ChangeNotifier {
 
   Document? get factureEnEdition => _factureEnEdition;
 
-  List<Document> get factures => _factures;
+  //List<Document> get factures => _factures;
 
   Document? get factureEnCours => _factureEnCours;
 
@@ -35,7 +39,9 @@ class FacturationProvider with ChangeNotifier {
 
   FacturationProvider() {
     _objectBox.init().then((_) {
-      _chargerFactures();
+      //_chargerFactures();
+      chargerFactures();
+      //chargerFacturesPaginees();
     });
   }
 
@@ -47,6 +53,122 @@ class FacturationProvider with ChangeNotifier {
   double _impayer = 0.0;
 
   double get impayer => _impayer;
+
+  ////////////////////////////////Liste des facture//////////////////////////////////////
+
+  bool _isLoadingListFacture = false;
+
+  bool get isLoadingListFacture => _isLoadingListFacture;
+
+  List<Document> _facturesList = [];
+
+  List<Document> get facturesList => _facturesList.reversed.toList();
+
+  int _currentPageFacture = 0;
+  final int _pageSizeFacture = 20;
+  bool _hasMoreFactures = true;
+
+  bool get hasMoreFactures => _hasMoreFactures;
+
+  Future<void> chargerFactures({bool reset = false}) async {
+    if (_isLoadingListFacture || !_hasMoreFactures) {
+      print(
+          "🚫 Appel ignoré : _isLoadingListFacture = $_isLoadingListFacture, _hasMoreFactures = $_hasMoreFactures");
+      return;
+    }
+
+    _isLoadingListFacture = true;
+    notifyListeners();
+    print("🔄 Début du chargement des factures...");
+
+    try {
+      if (reset) {
+        _currentPageFacture = 0;
+        _facturesList.clear(); // Utilisez _facturesList au lieu de facturesList
+        print(
+            "🔄 Réinitialisation de la pagination : _currentPageFacture = $_currentPageFacture");
+      }
+
+      final offset = _currentPageFacture * _pageSizeFacture;
+      final limit = _pageSizeFacture;
+      print("📊 Pagination : offset = $offset, limit = $limit");
+
+      final query = _objectBox.factureBox
+          .query()
+          .order(Document_.id, flags: Order.descending)
+          .build()
+        ..offset = offset
+        ..limit = limit;
+
+      print("🔍 Exécution de la requête pour récupérer les factures...");
+      final newFactures = await query.find();
+      print("✅ ${newFactures.length} factures récupérées");
+
+      // Ajouter les nouvelles factures à _facturesList
+      _facturesList.addAll(
+          newFactures); // Utilisez _facturesList au lieu de facturesList
+      print(
+          "📥 ${newFactures.length} factures ajoutées à _facturesList : ${_facturesList.length}");
+
+      if (newFactures.length < _pageSizeFacture) {
+        _hasMoreFactures = false;
+        print(
+            "⛔ Plus de factures à charger : _hasMoreFactures = $_hasMoreFactures");
+      } else {
+        _currentPageFacture++;
+        _hasMoreFactures = true;
+        print(
+            "➡️ Page suivante : _currentPageFacture = $_currentPageFacture, _hasMoreFactures = $_hasMoreFactures");
+      }
+    } catch (e) {
+      print("❌ Erreur lors du chargement des factures : $e");
+    } finally {
+      _isLoadingListFacture = false;
+      notifyListeners();
+      print(
+          "✅ Chargement terminé : _isLoadingListFacture = $_isLoadingListFacture");
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////
+  Future<void> chargerFacturesPaginees2() async {
+    if (_isLoadingListFacture || !_hasMoreFactures) return;
+
+    _isLoadingListFacture = true;
+    notifyListeners();
+
+    try {
+      // Calculer l'offset et le limit pour la pagination
+      final offset = _currentPageFacture * _pageSizeFacture;
+      final limit = _pageSizeFacture; // Limite des résultats à récupérer
+      // Construire et configurer la requête
+      final query = _objectBox.factureBox
+          .query()
+          .order(Document_.derniereModification, flags: Order.descending)
+          .build()
+        ..offset = offset
+        ..limit = limit;
+
+      // Effectuer la recherche dans ObjectBox
+      final nouvellesFactures = await query
+          .find(); // Utilisation de `await` pour exécution asynchrone
+      query.close(); // Fermer la requête après utilisation
+
+      if (nouvellesFactures.isEmpty) {
+        _hasMoreFactures =
+            false; // Indiquer qu'il n'y a plus de données disponibles
+      } else {
+        _facturesList.addAll(
+            nouvellesFactures); // Ajouter les nouvelles factures à la liste
+        _currentPageFacture++; // Passer à la page suivante
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des factures : $e");
+    } finally {
+      _isLoadingListFacture = false;
+      notifyListeners();
+    }
+  }
 
   void setImpayer(double value) {
     _impayer = value;
@@ -118,10 +240,10 @@ class FacturationProvider with ChangeNotifier {
     return _objectBox.clientBox.getAll();
   }
 
-  void _chargerFactures() {
-    _factures = _objectBox.factureBox.getAll();
-    notifyListeners();
-  }
+  // void _chargerFactures() {
+  //   _factures = _objectBox.factureBox.getAll();
+  //   notifyListeners();
+  // }
 
   void marquerCommeSauvegardee(Document facture) {
     _factureEnEdition = null; // Réinitialiser la facture en cours d'édition
@@ -321,7 +443,7 @@ class FacturationProvider with ChangeNotifier {
         }
 
         // Ajouter la nouvelle facture à la liste des factures
-        _factures.add(nouvelleFacture);
+        _facturesList.add(nouvelleFacture);
       } else {
         // Mettre à jour la facture existante
         _factureEnCours!.lignesDocument.clear();
@@ -348,7 +470,8 @@ class FacturationProvider with ChangeNotifier {
       _lignesFacture.clear();
       _impayer = 0.0;
       _selectedClient = null; // Réinitialiser le client sélectionné
-      _chargerFactures();
+      chargerFactures();
+      // chargerFacturesPaginees();
 
       print('Facture sauvegardée avec succès');
       _isEditing = false; // Désactiver l'état d'édition après la sauvegarde
@@ -375,7 +498,7 @@ class FacturationProvider with ChangeNotifier {
     }
 
     // Mettre à jour la liste des factures
-    _factures.remove(facture);
+    _facturesList.remove(facture);
 
     // Si la facture supprimée est la facture en cours, la réinitialiser
     if (_factureEnCours?.id == facture.id) {
@@ -430,12 +553,46 @@ class EditableFieldProvider with ChangeNotifier {
     print('isEditable: $_isEditable'); // Ajout de log
     notifyListeners();
   }
-//
-// void modifierImpayer(double impayer) {
-//   if (_impayer != impayer) {
-//     _impayer = impayer;
-//     _hasChanges = true;
-//     notifyListeners();
-//   }
-// }
+}
+
+/// Extension on DateTime to standardize date handling
+extension DateTimeExtension on DateTime {
+  DateTime get startOfDay => DateTime(year, month, day);
+
+  DateTime get endOfDay => DateTime(year, month, day, 23, 59, 59, 999);
+}
+
+/// Response class for paginated results
+class PaginatedResponse<T> {
+  final List<T> items;
+  final int totalCount;
+  final int currentPage;
+  final int pageSize;
+  final bool hasNextPage;
+
+  PaginatedResponse({
+    required this.items,
+    required this.totalCount,
+    required this.currentPage,
+    required this.pageSize,
+  }) : hasNextPage = (currentPage + 1) * pageSize < totalCount;
+
+  int get totalPages => (totalCount / pageSize).ceil();
+}
+
+/// Filter options for document queries
+class DocumentFilterOptions {
+  final String? searchQuery;
+  final DateTimeRange? dateRange;
+  final DocumentEtat? etat;
+  final String? type;
+  final bool? isSynced;
+
+  DocumentFilterOptions({
+    this.searchQuery,
+    this.dateRange,
+    this.etat,
+    this.type,
+    this.isSynced,
+  });
 }

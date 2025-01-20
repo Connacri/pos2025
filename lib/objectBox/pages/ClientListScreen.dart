@@ -124,8 +124,8 @@ class _ClientListScreenState extends State<ClientListScreen> {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
-                isScrollControlled:
-                    true, // Permet de redimensionner en fonction de la hauteur du contenu
+                isScrollControlled: true,
+                // Permet de redimensionner en fonction de la hauteur du contenu
                 builder: (context) => AddClientForm(),
               );
             },
@@ -222,6 +222,9 @@ class ClientDetailsPage extends StatelessWidget {
               'Nom: ${client.nom}',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
+            Divider(
+              indent: 5,
+            ),
             Text('Téléphone: ${client.phone}'),
             Text('Adresse: ${client.adresse}'),
             Text('Description: ${client.description}'),
@@ -285,9 +288,8 @@ class _AddClientFormState extends State<AddClientForm> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context)
-            .viewInsets
-            .bottom, // Permet de remonter le BottomSheet lorsque le clavier apparaît
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        // Permet de remonter le BottomSheet lorsque le clavier apparaît
         left: 16,
         right: 16,
         top: 16,

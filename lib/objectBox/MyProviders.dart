@@ -74,13 +74,22 @@ class CommerceProvider extends ChangeNotifier {
       produits.clear();
     }
 
-    // Créer la requête pour récupérer les produits triés par ID descendant
-    final query = _objectBox.produitBox.query()
-      ..order(Produit_.id, flags: Order.descending);
+    // // Créer la requête pour récupérer les produits triés par ID descendant
+    // final query = _objectBox.produitBox.query()
+    //   ..order(Produit_.id, flags: Order.descending);
+    //
+    // // Récupérer tous les produits
+    // final allProduits = await query.build().find();
+    final query = _objectBox.produitBox
+        .query()
+        .order(Produit_.id, flags: Order.descending)
+        .build()
+      ..offset =
+          _currentPage * _pageSize // Ignorer les produits des pages précédentes
+      ..limit = _pageSize; // Limiter le nombre de produits récupérés
 
-    // Récupérer tous les produits
-    final allProduits = await query.build().find();
-
+    final allProduits = await query.find();
+    produits.addAll(allProduits);
     // Gérer la pagination
     final startIndex = _currentPage * _pageSize;
     final endIndex = startIndex + _pageSize;
