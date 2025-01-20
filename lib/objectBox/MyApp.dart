@@ -371,7 +371,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     //   },
                     //   icon: Icon(Icons.kayaking),
                     // ),
-                    //  buildFutureBuilderLicenceCheckerRemainder(),
+                    // buildFutureBuilderLicenceCheckerRemainder(),
                     WinMobile(),
                     // Switch(
                     //   value: isSwitchOn,
@@ -1434,7 +1434,8 @@ class _adaptiveHomeState extends State<adaptiveHome> {
           );
         } else {
           return Text(
-            "Licence expirée ou invalide TEST",
+            '',
+            // "Licence expirée ou invalide TEST",
             style: TextStyle(fontSize: 18, color: Colors.red),
           );
         }
