@@ -371,7 +371,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     //   },
                     //   icon: Icon(Icons.kayaking),
                     // ),
-
+                    //  buildFutureBuilderLicenceCheckerRemainder(),
                     WinMobile(),
                     // Switch(
                     //   value: isSwitchOn,
@@ -1221,6 +1221,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                   // buildIconButtonClearQrCodes(),
 
                   // Switch pour basculer entre les thèmes
+                  buildFutureBuilderLicenceCheckerRemainder(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Switch(
@@ -1414,6 +1415,27 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                 },
               ),
             ),
+          );
+        }
+      },
+    );
+  }
+
+  FutureBuilder<int> buildFutureBuilderLicenceCheckerRemainder() {
+    return FutureBuilder<int>(
+      future: _getRemainingDays(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasData && snapshot.data! >= 0) {
+          return Text(
+            "Jours restants: ${snapshot.data}",
+            style: TextStyle(fontSize: 18, color: Colors.green),
+          );
+        } else {
+          return Text(
+            "Licence expirée ou invalide TEST",
+            style: TextStyle(fontSize: 18, color: Colors.red),
           );
         }
       },
@@ -1890,6 +1912,19 @@ class _adaptiveHomeState extends State<adaptiveHome> {
         ],
       ),
     );
+  }
+
+  Future<int> _getRemainingDays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final expiresAtString = prefs.getString('licenseExpiresAt');
+
+    if (expiresAtString != null) {
+      final expiresAt = DateTime.parse(expiresAtString);
+      final now = DateTime.now();
+      return expiresAt.difference(now).inDays;
+    }
+
+    return -1; // Aucune licence valide trouvée
   }
 
 // Future<void> _toggleWindowSize(bool value) async {
