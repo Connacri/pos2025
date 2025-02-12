@@ -12,7 +12,6 @@ import 'package:network_info_plus/network_info_plus.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:pincode_input_fields/pincode_input_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'MyApp.dart';
 
@@ -28,10 +27,8 @@ class _hashPageState extends State<hashPage> {
   String _numHash = '';
   String _enteredHash = '';
   String _p4ssw0rd = "Oran2024";
-  String _p4ssw0rdSupabase = '';
   bool _isShowMessage = false;
   bool _isLicenseValidated = false;
-  bool _isLicenseDemoValidated = false;
   String _statusMessage = "Entrer le Code PIN";
   int _lengthPin = 10;
   int _attempts = 0;
@@ -72,11 +69,6 @@ class _hashPageState extends State<hashPage> {
   Future<void> _saveLicenseStatus(bool status) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLicenseValidated', status);
-  }
-
-  Future<void> _saveLicenseDemoStatus(bool status) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLicenseDemoValidated', status);
   }
 
   Future<void> _removeLicenseStatus() async {
@@ -130,7 +122,7 @@ class _hashPageState extends State<hashPage> {
           ),
         ],
       ),
-      body: _isLicenseValidated || _isLicenseDemoValidated
+      body: _isLicenseValidated
           ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,31 +131,10 @@ class _hashPageState extends State<hashPage> {
                 Lottie.asset('assets/lotties/1 (28).json'),
                 Spacer(),
                 Center(
-                  child: FutureBuilder<int>(
-                    future: _getRemainingDays(), // Récupérer les jours restants
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        // Afficher un indicateur de chargement pendant que les données sont récupérées
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        // Gérer les erreurs
-                        return Text(
-                          "Erreur lors de la récupération des jours restants.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 25, color: Colors.red),
-                        );
-                      } else {
-                        final remainingDays = snapshot.data ??
-                            -1; // Valeur par défaut si non trouvée
-                        return Text(
-                          _isLicenseDemoValidated
-                              ? "Licence Démonstration de 30 Jours,\nJours restants : $remainingDays\nL'application est activée Temporairement."
-                              : "Licence validée,\nL'application est activée.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 25, color: Colors.green),
-                        );
-                      }
-                    },
+                  child: Text(
+                    "Licence validée,\nL'application est activée.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 25, color: Colors.green),
                   ),
                 ),
                 Spacer(),
@@ -313,57 +284,15 @@ class _hashPageState extends State<hashPage> {
                         _enteredHash = value;
                       });
                     },
-                    // onInputComplete: () {
-                    //   setState(() {
-                    //     _statusMessage = "Validation en cours...";
-                    //   });
-                    //   //////////////////Licence Démonstration Beta!//////////////////
-                    //   checkAndValidateDemoLicense();
-                    //   ///////////////////////////////////////////////////////////////
-                    //   Future.delayed(Duration(seconds: 2), () {
-                    //     if (validateNumHash(
-                    //         _enteredHash, _hash512, _p4ssw0rd, _lengthPin)) {
-                    //       _saveLicenseStatus(true);
-                    //       setState(() {
-                    //         _isLicenseValidated = true;
-                    //         _statusMessage2 = "Licence Numérique validée!";
-                    //       });
-                    //     } else {
-                    //       _attempts++;
-                    //       if (_attempts >= 3 && _attempts < 6) {
-                    //         _statusMessage2 =
-                    //             "PIN Hash incorrect! Tentatives restantes: ${3 - _attempts}";
-                    //         if (_attempts == 3) {
-                    //           _disableInput(Duration(minutes: 1));
-                    //         }
-                    //       } else if (_attempts >= 6 && _attempts < 9) {
-                    //         _statusMessage2 =
-                    //             "PIN Hash incorrect! Tentatives restantes: ${6 - _attempts}";
-                    //         if (_attempts == 6) {
-                    //           _disableInput(Duration(minutes: 5));
-                    //         }
-                    //       } else if (_attempts >= 9) {
-                    //         _statusMessage2 =
-                    //             "Trop de tentatives échouées. Veuillez entrer votre adresse MAC et votre numéro de téléphone.";
-                    //         _showMacAndPhoneFields;
-                    //       } else {
-                    //         _statusMessage2 = "PIN Hash incorrect!";
-                    //       }
-                    //     }
-                    //   });
-                    // },
-                    onInputComplete: () async {
+                    onInputComplete: () {
                       setState(() {
                         _statusMessage = "Validation en cours...";
                       });
 
-                      // Vérifier et valider la licence de démonstration
-                      // await checkAndValidateDemoLicense();
-
-                      Future.delayed(Duration(seconds: 2), () async {
+                      Future.delayed(Duration(seconds: 2), () {
                         if (validateNumHash(
                             _enteredHash, _hash512, _p4ssw0rd, _lengthPin)) {
-                          await _saveLicenseStatus(true);
+                          _saveLicenseStatus(true);
                           setState(() {
                             _isLicenseValidated = true;
                             _statusMessage2 = "Licence Numérique validée!";
@@ -385,6 +314,7 @@ class _hashPageState extends State<hashPage> {
                           } else if (_attempts >= 9) {
                             _statusMessage2 =
                                 "Trop de tentatives échouées. Veuillez entrer votre adresse MAC et votre numéro de téléphone.";
+                            _showMacAndPhoneFields;
                           } else {
                             _statusMessage2 = "PIN Hash incorrect!";
                           }
@@ -525,129 +455,6 @@ class _hashPageState extends State<hashPage> {
             ),
     );
   }
-
-  Future<void> checkAndValidateDemoLicense() async {
-    final supabase = Supabase.instance.client;
-
-    try {
-      // Vérifier si _enteredHash existe dans la table Supabase
-      final response = await supabase
-          .from('hashCodeTemp') // Nom de la table
-          .select(
-              'hash_code, expires_at') // Récupérer le hash_code et la date d'expiration
-          .eq('hash_code',
-              _enteredHash.trim()) // Vérifier si _enteredHash correspond
-          .single(); // Récupérer un seul enregistrement
-
-      // Afficher les détails de la réponse pour le débogage
-      print('Response: $response');
-      print('_enteredHash: $_enteredHash');
-
-      if (response != null) {
-        // Si _enteredHash existe dans Supabase
-        print('Code trouvé dans Supabase');
-        print('_enteredHash: $_enteredHash');
-        print('Response: $response');
-
-        // Récupérer les valeurs de la réponse
-        final hashCode = response['hash_code'] as String?;
-        final expiresAtString = response['expires_at'] as String?;
-
-        // Vérifier si les champs requis sont non nuls
-        if (hashCode != null && expiresAtString != null) {
-          // Vérifier si _enteredHash correspond au hash_code dans la réponse
-          if (hashCode == _enteredHash.trim()) {
-            // Parser la date d'expiration
-            final expiresAt = DateTime.parse(expiresAtString);
-
-            // Calculer les jours restants
-            final now = DateTime.now();
-            final remainingDays = expiresAt.difference(now).inDays;
-
-            // Sauvegarder les informations de la licence dans SharedPreferences
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString(
-                'licenseExpiresAt', expiresAt.toIso8601String());
-            await prefs.setInt('remainingDays', remainingDays);
-
-            // Sauvegarder l'état de la licence de démonstration
-            await _saveLicenseDemoStatus(true);
-
-            // Mettre à jour l'état de l'application
-            setState(() {
-              _isLicenseDemoValidated = true;
-              _statusMessage2 =
-                  "Licence Démonstration Beta! Jours restants: $remainingDays";
-            });
-          } else {
-            // Si _enteredHash ne correspond pas au hash_code dans la réponse
-            setState(() {
-              _statusMessage2 = "Code incorrect!";
-            });
-          }
-        } else {
-          // Si des champs requis sont manquants dans la réponse
-          setState(() {
-            _statusMessage2 =
-                "Données de licence incomplètes dans la base de données.";
-          });
-        }
-      } else {
-        // Si _enteredHash n'existe pas dans Supabase
-        print('Code non trouvé dans Supabase');
-        setState(() {
-          _statusMessage2 =
-              "Code incorrect ou non trouvé dans la base de données.";
-        });
-      }
-    } catch (e) {
-      // Gérer les erreurs de requête (par exemple, absence de connexion Internet)
-      print('Erreur lors de la requête Supabase: $e');
-
-      // Utiliser les données locales pour vérifier le temps restant
-      final remainingDays = await _getRemainingDays();
-
-      if (remainingDays == -1) {
-        setState(() {
-          _statusMessage2 = "Aucune licence valide trouvée.";
-        });
-      } else if (remainingDays == 0) {
-        setState(() {
-          _statusMessage2 =
-              "Licence expirée ou utilisation hors ligne dépassée.";
-        });
-      } else {
-        setState(() {
-          _statusMessage2 =
-              "Licence Démonstration Beta! Jours restants: $remainingDays";
-        });
-      }
-    }
-  }
-}
-
-Future<int> _getRemainingDays() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  final expiresAtString = prefs.getString('licenseExpiresAt');
-  final lastOnlineCheckString = prefs.getString('lastOnlineCheck');
-
-  if (expiresAtString == null || lastOnlineCheckString == null) {
-    return -1; // Aucune licence valide trouvée
-  }
-
-  final expiresAt = DateTime.parse(expiresAtString);
-  final lastOnlineCheck = DateTime.parse(lastOnlineCheckString);
-  final now = DateTime.now();
-
-  // Vérifier si l'utilisateur est hors ligne depuis plus de 2 jours
-  final offlineDuration = now.difference(lastOnlineCheck);
-  if (offlineDuration.inDays > 2) {
-    return 0; // Bloquer l'application après 2 jours hors ligne
-  }
-
-  // Calculer le temps restant
-  final remainingTime = expiresAt.difference(now);
-  return remainingTime.inDays;
 }
 
 Future<String?> getDeviceIdentifier() async {
@@ -692,6 +499,10 @@ String generateShortHash(String _hash512, String password) {
   return digest.toString();
 }
 
+String generateNumHash(String _hash512, String password, int _lengthPin) {
+  return generateNumericCode(_hash512, password, _lengthPin);
+}
+
 bool validateHash(String enteredHash, String _hash512, String password) {
   var calculatedHash = generateShortHash(_hash512, password);
   return enteredHash == calculatedHash;
@@ -701,10 +512,6 @@ bool validateNumHash(
     String enteredHash, String _hash512, String password, int _lengthPin) {
   var calculatedHash = generateNumHash(_hash512, password, _lengthPin);
   return enteredHash == calculatedHash;
-}
-
-String generateNumHash(String _hash512, String password, int _lengthPin) {
-  return generateNumericCode(_hash512, password, _lengthPin);
 }
 
 String generateNumericCode(String _hash512, String password, int _lengthPin) {
@@ -732,7 +539,6 @@ class HashAdmin extends StatefulWidget {
 
 class _HashAdminState extends State<HashAdmin> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-
   //QRViewController? controller;
   MobileScannerController? controller;
   String? qrCodeHash;
@@ -810,9 +616,8 @@ class _HashAdminState extends State<HashAdmin> {
                         child: Column(
                           children: [
                             //Text('Hash QR code: $qrCodeHash'),
-                            FittedBox(
-                                child: Text('Serial PIN: $qrCodeNumHash')),
-                            // Affichage du code numérique
+                            Text(
+                                'Serial PIN: $qrCodeNumHash'), // Affichage du code numérique
                             Divider(),
                             // SelectableText(
                             //   generateHash(qrCodeHash!, _p4ssw0rd), //_hash512
@@ -875,10 +680,10 @@ class _HashAdminState extends State<HashAdmin> {
     super.deactivate();
   }
 
-// @override
-// void reassemble() {
-//   super.reassemble();
-//   controller?.pauseCamera(); // Pause la caméra lors du hot reload
-//   controller?.resumeCamera(); // Reprendre la caméra après le hot reload
-// }
+  // @override
+  // void reassemble() {
+  //   super.reassemble();
+  //   controller?.pauseCamera(); // Pause la caméra lors du hot reload
+  //   controller?.resumeCamera(); // Reprendre la caméra après le hot reload
+  // }
 }

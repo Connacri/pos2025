@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:330293988254:android:0562d6c8bd50fd4141648f",
+        "mobilesdk_app_id": "1:330293988254:android:61adcf051c6c384c41648f",
         "android_client_info": {
           "package_name": "com.wallet.dz"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "330293988254-5p93m05gsefgb03j1mrkjrup8ul6nk84.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.wallet.dz",
-            "certificate_hash": "503bca0e7d9cf11193b8a34339154f33bc34aace"
-          }
-        },
         {
           "client_id": "330293988254-c3b9hgmt0hat5jfqi69j4jkn3pe6fhkv.apps.googleusercontent.com",
           "client_type": 3
@@ -48,7 +40,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-2282149611905342~2957460195"
     }
   ],
   "configuration_version": "1"

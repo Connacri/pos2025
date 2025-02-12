@@ -1,25 +1,19 @@
-import 'dart:async';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kenzy/objectBox/pages/home_Carousel.dart';
 import 'package:kenzy/objectBox/tests/hotelScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:supabase_flutter/supabase_flutter.dart' as su;
-import '../main.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../objectBox/pages/addProduct.dart';
 import '../objectBox/pages/ClientListScreen.dart';
 import '../objectBox/tests/cruds.dart' as cruds;
 import '../../MyListLotties.dart';
 import '../objectbox.g.dart';
-
 import '../vids/VideoPlayerScreen.dart';
 import 'Entity.dart';
-import 'FuturisticConnectionUI.dart';
 import 'MyProviders.dart';
 import 'Utils/excel.dart';
 import 'Utils/supabase_sync.dart';
@@ -84,7 +78,6 @@ class MyApp9 extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AdProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
 //////////////////////////////////////////////////////////////////
-        ChangeNotifierProvider(create: (_) => ConnectionStatusProvider()),
         ChangeNotifierProvider(create: (_) => FacturationProvider()),
         ChangeNotifierProvider(create: (_) => EditableFieldProvider()),
       ],
@@ -176,27 +169,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
   void initState() {
     super.initState();
     _loadPrix();
-    _loadLicenseInfo();
     // _showInterstitialAd();
-  }
-
-  int remainingDays = -1;
-  bool isDemoLicense = false;
-
-  Future<void> _loadLicenseInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Récupérer les valeurs depuis SharedPreferences
-    final savedRemainingDays = prefs.getInt('remainingDays');
-    final savedIsDemoLicense = prefs.getBool('isDemoLicense');
-
-    // Mettre à jour l'état local
-    setState(() {
-      remainingDays = savedRemainingDays ??
-          -1; // Utiliser -1 comme valeur par défaut si null
-      isDemoLicense = savedIsDemoLicense ??
-          false; // Utiliser false comme valeur par défaut si null
-    });
   }
 
   //////////////////////////////////////ads////////////////////////////////////////
@@ -382,7 +355,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
     final randomId = Random().nextInt(100);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 600) {
+        if (constraints.maxWidth < 700) {
           // Mobile layout
           return SafeArea(
             child: DefaultTabController(
@@ -391,39 +364,6 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                 appBar: AppBar(
                   title: Text('POS'),
                   actions: [
-                    ConnectionStatusIndicator(),
-                    Platform.isAndroid || Platform.isIOS
-                        ? SizedBox.shrink()
-                        : WinMobile(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Switch(
-                        value: Provider.of<ThemeProvider>(context).isDarkTheme,
-                        onChanged: (value) {
-                          Provider.of<ThemeProvider>(context, listen: false)
-                              .toggleTheme();
-                        },
-                        inactiveThumbImage: CachedNetworkImageProvider(
-                            'https://img.freepik.com/free-vector/natural-landscape-background-video-conferencing_23-2148653740.jpg?semt=ais_hybrid'),
-                        activeThumbImage: CachedNetworkImageProvider(
-                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdyzjpBSojo_zxZ535JaX7d9dVC-aF-fPr3A&s'),
-                      ),
-                    ),
-                    Platform.isAndroid || Platform.isIOS
-                        ? IconButton(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (ctx) => HashAdmin(
-                                        lengthPin: lengthPin,
-                                      )));
-                            },
-                            icon: Icon(Icons.verified_user),
-                          )
-                        : Container(),
-                    IconButton(
-                      onPressed: () => _showDialogFake(objectBoxi),
-                      icon: Icon(Icons.send),
-                    ),
                     // IconButton(
                     //   onPressed: () {
                     //     Navigator.of(context).push(MaterialPageRoute(
@@ -432,7 +372,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     //   icon: Icon(Icons.kayaking),
                     // ),
                     // buildFutureBuilderLicenceCheckerRemainder(),
-
+                    WinMobile(),
                     // Switch(
                     //   value: isSwitchOn,
                     //   onChanged: _toggleWindowSize, // Bascule entre les modes
@@ -582,18 +522,44 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     //   },
                     //   icon: Icon(Icons.qr_code_scanner, color: Colors.blue),
                     // ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Switch(
+                        value: Provider.of<ThemeProvider>(context).isDarkTheme,
+                        onChanged: (value) {
+                          Provider.of<ThemeProvider>(context, listen: false)
+                              .toggleTheme();
+                        },
+                        inactiveThumbImage: CachedNetworkImageProvider(
+                            'https://img.freepik.com/free-vector/natural-landscape-background-video-conferencing_23-2148653740.jpg?semt=ais_hybrid'),
+                        activeThumbImage: CachedNetworkImageProvider(
+                            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdyzjpBSojo_zxZ535JaX7d9dVC-aF-fPr3A&s'),
+                      ),
+                    ),
+                    Platform.isAndroid || Platform.isIOS
+                        ? Container()
+                        : IconButton(
+                            onPressed: () =>
+                                showForcedRewardedAd(context, hashPage()),
 
-                    // IconButton(
-                    //   onPressed: () =>
-                    //       showForcedRewardedAd(context, hashPage()),
-                    //
-                    //   // onPressed: () {
-                    //   //   Navigator.of(context)
-                    //   //       .push(MaterialPageRoute(builder: (ctx) => hashPage()));
-                    //   // },
-                    //   icon: Icon(Icons.add_chart_rounded, color: Colors.green),
-                    // ),
-
+                            // onPressed: () {
+                            //   Navigator.of(context)
+                            //       .push(MaterialPageRoute(builder: (ctx) => hashPage()));
+                            // },
+                            icon: Icon(Icons.add_chart_rounded,
+                                color: Colors.green),
+                          ),
+                    Platform.isAndroid || Platform.isIOS
+                        ? IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (ctx) => HashAdmin(
+                                        lengthPin: lengthPin,
+                                      )));
+                            },
+                            icon: Icon(Icons.qr_code_scanner),
+                          )
+                        : Container(),
                     // IconButton(
                     //         onPressed: () {
                     //           Navigator.of(context)
@@ -625,16 +591,19 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     // SizedBox(
                     //   width: 50,
                     // ),
-                    // IconButton(
-                    //   onPressed: () {
-                    //     Navigator.of(context).push(MaterialPageRoute(
-                    //         builder: (ctx) => ProduitListPage(
-                    //             supabase: Supabase.instance.client,
-                    //             objectboxStore: widget.objectBox.store)));
-                    //   },
-                    //   icon: Icon(Icons.local_police),
-                    // ),
-
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (ctx) => ProduitListPage(
+                                supabase: Supabase.instance.client,
+                                objectboxStore: widget.objectBox.store)));
+                      },
+                      icon: Icon(Icons.local_police),
+                    ),
+                    IconButton(
+                      onPressed: () => _showDialogFake(objectBoxi),
+                      icon: Icon(Icons.send),
+                    ),
                     // IconButton(
                     //   onPressed: () {
                     //     Navigator.of(context).push(MaterialPageRoute(
@@ -642,6 +611,9 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     //   },
                     //   icon: Icon(Icons.local_bar_outlined),
                     // ),
+                    SizedBox(
+                      width: 60,
+                    )
                   ],
                   bottom: TabBar(
                     tabs: [
@@ -699,230 +671,135 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          // Row(
-                          //   children: [
-                          //     ElevatedButton(
-                          //         onPressed: () => Navigator.of(context)
-                          //                 .push(MaterialPageRoute(
-                          //               builder: (ctx) => HotelReservationChart(
-                          //                 fromDate: DateTime(2024, 1, 1),
-                          //                 toDate: DateTime(2024, 12, 31),
-                          //                 roomNames: roomNumbers,
-                          //                 reservations: [
-                          //                   Reservation(
-                          //                     clientName: "John Doe",
-                          //                     roomName: "101",
-                          //                     startDate: DateTime(2024, 1, 5),
-                          //                     endDate: DateTime(2024, 1, 9),
-                          //                     pricePerNight: 100.0,
-                          //                     status: "Confirmed",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "Jane Smith",
-                          //                     roomName: "102",
-                          //                     startDate: DateTime(2024, 2, 4),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 150.0,
-                          //                     status: "Checked In",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "John Doe",
-                          //                     roomName: "103",
-                          //                     startDate: DateTime(2024, 2, 1),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 100.0,
-                          //                     status: "Confirmed",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "Jane Smith",
-                          //                     roomName: "104",
-                          //                     startDate: DateTime(2024, 2, 4),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 150.0,
-                          //                     status: "Checked In",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "John Doe",
-                          //                     roomName: "105",
-                          //                     startDate: DateTime(2024, 1, 2),
-                          //                     endDate: DateTime(2024, 1, 5),
-                          //                     pricePerNight: 100.0,
-                          //                     status: "Confirmed",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "Jane Smith",
-                          //                     roomName: "108",
-                          //                     startDate: DateTime(2024, 2, 4),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 150.0,
-                          //                     status: "Checked In",
-                          //                   ),
-                          //                 ],
-                          //               ),
-                          //             )),
-                          //         child: Text('Hotel')),
-                          //     SizedBox(
-                          //       width: 20,
-                          //     ),
-                          //     ElevatedButton(
-                          //         onPressed: () => Navigator.of(context)
-                          //                 .push(MaterialPageRoute(
-                          //               builder: (ctx) =>
-                          //                   CalendarTableWithDragging(
-                          //                 fromDate: DateTime.now(),
-                          //                 toDate: DateTime.now()
-                          //                     .add(Duration(days: 30)),
-                          //                 roomNames: roomNumbers,
-                          //                 reservations: [
-                          //                   Reservation(
-                          //                     clientName: "John Doe",
-                          //                     roomName: "101",
-                          //                     startDate: DateTime(2024, 1, 5),
-                          //                     endDate: DateTime(2024, 1, 9),
-                          //                     pricePerNight: 100.0,
-                          //                     status: "Confirmed",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "Jane Smith",
-                          //                     roomName: "102",
-                          //                     startDate: DateTime(2024, 2, 4),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 150.0,
-                          //                     status: "Checked In",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "John Doe",
-                          //                     roomName: "103",
-                          //                     startDate: DateTime(2024, 2, 1),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 100.0,
-                          //                     status: "Confirmed",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "Jane Smith",
-                          //                     roomName: "104",
-                          //                     startDate: DateTime(2024, 2, 4),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 150.0,
-                          //                     status: "Checked In",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "John Doe",
-                          //                     roomName: "105",
-                          //                     startDate: DateTime(2024, 1, 2),
-                          //                     endDate: DateTime(2024, 1, 5),
-                          //                     pricePerNight: 100.0,
-                          //                     status: "Confirmed",
-                          //                   ),
-                          //                   Reservation(
-                          //                     clientName: "Jane Smith",
-                          //                     roomName: "108",
-                          //                     startDate: DateTime(2024, 2, 4),
-                          //                     endDate: DateTime(2024, 2, 5),
-                          //                     pricePerNight: 150.0,
-                          //                     status: "Checked In",
-                          //                   ),
-                          //                 ],
-                          //               ),
-                          //             )),
-                          //         child: Text('Hotel Fiable')),
-                          //   ],
-                          // ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.all(15.0),
-                              // Espacement à l'intérieur du cadre
-                              decoration: BoxDecoration(
-                                //      color: Colors.grey, // Couleur de fond
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Bords arrondis
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  // Couleur de la bordure
-                                  width: 1.0, // Épaisseur de la bordure
-                                ),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () => Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                        builder: (ctx) => HotelReservationChart(
+                                          fromDate: DateTime(2024, 1, 1),
+                                          toDate: DateTime(2024, 12, 31),
+                                          roomNames: roomNumbers,
+                                          reservations: [
+                                            Reservation(
+                                              clientName: "John Doe",
+                                              roomName: "101",
+                                              startDate: DateTime(2024, 1, 5),
+                                              endDate: DateTime(2024, 1, 9),
+                                              pricePerNight: 100.0,
+                                              status: "Confirmed",
+                                            ),
+                                            Reservation(
+                                              clientName: "Jane Smith",
+                                              roomName: "102",
+                                              startDate: DateTime(2024, 2, 4),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 150.0,
+                                              status: "Checked In",
+                                            ),
+                                            Reservation(
+                                              clientName: "John Doe",
+                                              roomName: "103",
+                                              startDate: DateTime(2024, 2, 1),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 100.0,
+                                              status: "Confirmed",
+                                            ),
+                                            Reservation(
+                                              clientName: "Jane Smith",
+                                              roomName: "104",
+                                              startDate: DateTime(2024, 2, 4),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 150.0,
+                                              status: "Checked In",
+                                            ),
+                                            Reservation(
+                                              clientName: "John Doe",
+                                              roomName: "105",
+                                              startDate: DateTime(2024, 1, 2),
+                                              endDate: DateTime(2024, 1, 5),
+                                              pricePerNight: 100.0,
+                                              status: "Confirmed",
+                                            ),
+                                            Reservation(
+                                              clientName: "Jane Smith",
+                                              roomName: "108",
+                                              startDate: DateTime(2024, 2, 4),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 150.0,
+                                              status: "Checked In",
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                  child: Text('Hotel')),
+                              SizedBox(
+                                width: 20,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ElevatedButton.icon(
-                                    onPressed: () => showForcedRewardedAd(
-                                        context, FacturationPageUI()),
-                                    // onPressed: () {
-                                    //   Navigator.of(context).push(MaterialPageRoute(
-                                    //       builder: (_) => FacturePage()));
-                                    // },
-                                    label: Text(
-                                      'Factures',
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    icon: Icon(Icons.add)),
-                              ),
-                              // Column(
-                              //   children: [
-                              //     Text('Factures'),
-                              //
-                              //
-                              //
-                              //     Row(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       children: [
-                              //         Expanded(
-                              //           child: Padding(
-                              //             padding: const EdgeInsets.all(8.0),
-                              //             child: ElevatedButton.icon(
-                              //                 onPressed: () =>
-                              //                     showForcedRewardedAd(context,
-                              //                         FacturationPageUI()),
-                              //                 // onPressed: () {
-                              //                 //   Navigator.of(context).push(MaterialPageRoute(
-                              //                 //       builder: (_) => FacturePage()));
-                              //                 // },
-                              //                 label: Text(
-                              //                   'Ajouter',
-                              //                   overflow: TextOverflow.ellipsis,
-                              //                 ),
-                              //                 icon: Icon(Icons.add)),
-                              //           ),
-                              //         ),
-                              //
-                              //         Expanded(
-                              //           child: Padding(
-                              //             padding: const EdgeInsets.all(8.0),
-                              //             child: ElevatedButton.icon(
-                              //                 onPressed: () =>
-                              //                     showForcedRewardedAd(
-                              //                       context,
-                              //                       FactureList(),
-                              //                       // FacturesListPage(
-                              //                       //     // onFactureSelected:
-                              //                       //     //     (facture) {
-                              //                       //     //   setState(() {
-                              //                       //     //     selectedFacture =
-                              //                       //     //         facture;
-                              //                       //     //   });
-                              //                       //     // },
-                              //                       //     ),
-                              //                     ),
-                              //                 // onPressed: () {
-                              //                 //   Navigator.of(context).push(MaterialPageRoute(
-                              //                 //       builder: (_) => FacturesListPage()));
-                              //                 // },
-                              //                 label: Text(
-                              //                   'List',
-                              //                   overflow: TextOverflow.ellipsis,
-                              //                 ),
-                              //                 icon: Icon(Icons.list_alt)),
-                              //           ),
-                              //         ),
-                              //       ],
-                              //     ),
-                              //   ],
-                              // ),
-                            ),
+                              ElevatedButton(
+                                  onPressed: () => Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                        builder: (ctx) =>
+                                            CalendarTableWithDragging(
+                                          fromDate: DateTime.now(),
+                                          toDate: DateTime.now()
+                                              .add(Duration(days: 30)),
+                                          roomNames: roomNumbers,
+                                          reservations: [
+                                            Reservation(
+                                              clientName: "John Doe",
+                                              roomName: "101",
+                                              startDate: DateTime(2024, 1, 5),
+                                              endDate: DateTime(2024, 1, 9),
+                                              pricePerNight: 100.0,
+                                              status: "Confirmed",
+                                            ),
+                                            Reservation(
+                                              clientName: "Jane Smith",
+                                              roomName: "102",
+                                              startDate: DateTime(2024, 2, 4),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 150.0,
+                                              status: "Checked In",
+                                            ),
+                                            Reservation(
+                                              clientName: "John Doe",
+                                              roomName: "103",
+                                              startDate: DateTime(2024, 2, 1),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 100.0,
+                                              status: "Confirmed",
+                                            ),
+                                            Reservation(
+                                              clientName: "Jane Smith",
+                                              roomName: "104",
+                                              startDate: DateTime(2024, 2, 4),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 150.0,
+                                              status: "Checked In",
+                                            ),
+                                            Reservation(
+                                              clientName: "John Doe",
+                                              roomName: "105",
+                                              startDate: DateTime(2024, 1, 2),
+                                              endDate: DateTime(2024, 1, 5),
+                                              pricePerNight: 100.0,
+                                              status: "Confirmed",
+                                            ),
+                                            Reservation(
+                                              clientName: "Jane Smith",
+                                              roomName: "108",
+                                              startDate: DateTime(2024, 2, 4),
+                                              endDate: DateTime(2024, 2, 5),
+                                              pricePerNight: 150.0,
+                                              status: "Checked In",
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                  child: Text('Hotel Fiable')),
+                            ],
                           ),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1049,7 +926,100 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                                   color: Colors.blue,
                                 )),
                           ),
-
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.all(15.0),
+                              // Espacement à l'intérieur du cadre
+                              decoration: BoxDecoration(
+                                //      color: Colors.grey, // Couleur de fond
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // Bords arrondis
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  // Couleur de la bordure
+                                  width: 1.0, // Épaisseur de la bordure
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton.icon(
+                                    onPressed: () => showForcedRewardedAd(
+                                        context, FacturationPageUI()),
+                                    // onPressed: () {
+                                    //   Navigator.of(context).push(MaterialPageRoute(
+                                    //       builder: (_) => FacturePage()));
+                                    // },
+                                    label: Text(
+                                      'Factures',
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    icon: Icon(Icons.add)),
+                              ),
+                              // Column(
+                              //   children: [
+                              //     Text('Factures'),
+                              //
+                              //
+                              //
+                              //     Row(
+                              //       mainAxisAlignment: MainAxisAlignment.center,
+                              //       children: [
+                              //         Expanded(
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(8.0),
+                              //             child: ElevatedButton.icon(
+                              //                 onPressed: () =>
+                              //                     showForcedRewardedAd(context,
+                              //                         FacturationPageUI()),
+                              //                 // onPressed: () {
+                              //                 //   Navigator.of(context).push(MaterialPageRoute(
+                              //                 //       builder: (_) => FacturePage()));
+                              //                 // },
+                              //                 label: Text(
+                              //                   'Ajouter',
+                              //                   overflow: TextOverflow.ellipsis,
+                              //                 ),
+                              //                 icon: Icon(Icons.add)),
+                              //           ),
+                              //         ),
+                              //
+                              //         Expanded(
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(8.0),
+                              //             child: ElevatedButton.icon(
+                              //                 onPressed: () =>
+                              //                     showForcedRewardedAd(
+                              //                       context,
+                              //                       FactureList(),
+                              //                       // FacturesListPage(
+                              //                       //     // onFactureSelected:
+                              //                       //     //     (facture) {
+                              //                       //     //   setState(() {
+                              //                       //     //     selectedFacture =
+                              //                       //     //         facture;
+                              //                       //     //   });
+                              //                       //     // },
+                              //                       //     ),
+                              //                     ),
+                              //                 // onPressed: () {
+                              //                 //   Navigator.of(context).push(MaterialPageRoute(
+                              //                 //       builder: (_) => FacturesListPage()));
+                              //                 // },
+                              //                 label: Text(
+                              //                   'List',
+                              //                   overflow: TextOverflow.ellipsis,
+                              //                 ),
+                              //                 icon: Icon(Icons.list_alt)),
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ],
+                              // ),
+                            ),
+                          ),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(
@@ -1231,31 +1201,27 @@ class _adaptiveHomeState extends State<adaptiveHome> {
           );
         } else {
           // Desktop layout
-          final statusProvider = Provider.of<ConnectionStatusProvider>(context);
-
-          if (statusProvider.isBlocked) {
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.block, size: 100, color: Colors.red),
-                    Text("Application bloquée !",
-                        style: TextStyle(fontSize: 24)),
-                    Text("Veuillez vous reconnecter à Internet",
-                        style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ),
-            );
-          }
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
                 title: Text('POS Desktop'),
                 actions: [
-                  ConnectionStatusIndicator(),
                   WinMobile(),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //         builder: (ctx) => VerticalVideoListScreen()));
+                  //   },
+                  //   icon: Icon(Icons.kayaking),
+                  // ),
+                  // Switch(
+                  //   value: isSwitchOn,
+                  //   onChanged: _toggleWindowSize, // Bascule entre les modes
+                  // ),
+                  // buildIconButtonClearQrCodes(),
+
+                  // Switch pour basculer entre les thèmes
+                  buildFutureBuilderLicenceCheckerRemainder(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Switch(
@@ -1270,6 +1236,20 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdyzjpBSojo_zxZ535JaX7d9dVC-aF-fPr3A&s'),
                     ),
                   ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(
+                  //         MaterialPageRoute(builder: (ctx) => MyHomePageAds()));
+                  //   },
+                  //   icon: Icon(Icons.ads_click, color: Colors.deepPurple),
+                  // ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     // Appelez la méthode ici sans essayer d'utiliser sa valeur de retour
+                  //     widget.objectBox..ajouterQuantitesAleatoires();
+                  //   },
+                  //  icon: Icon(Icons.qr_code_scanner, color: Colors.blue),
+                  // ),
                   IconButton(
                     onPressed: () async {
                       if (Platform.isAndroid) {
@@ -1290,6 +1270,23 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     },
                     icon: Icon(FontAwesomeIcons.fileExcel),
                   ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //         builder: (ctx) => mobile_scanner_example()));
+                  //   },
+                  //   icon: Icon(Icons.home, color: Colors.black),
+                  // ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //         builder: (ctx) => QRScannerPage(
+                  //               lengthPin: 8,
+                  //               p4ssw0rd: 'Oran2024',
+                  //             )));
+                  //   },
+                  //   icon: Icon(Icons.qr_code_scanner, color: Colors.blue),
+                  // ),
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).push(
@@ -1328,7 +1325,15 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                   SizedBox(
                     width: 50,
                   ),
-
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (ctx) => ProduitListPage(
+                              supabase: Supabase.instance.client,
+                              objectboxStore: widget.objectBox.store)));
+                    },
+                    icon: Icon(Icons.local_police),
+                  ),
                   IconButton(
                     onPressed: () =>
                         //objectBox.fillWithFakeData(20, 20, 10, 20, 20),
@@ -1346,68 +1351,6 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                   SizedBox(
                     width: 50,
                   )
-                  // IconButton(
-                  //   onPressed: () {
-                  //     Navigator.of(context).push(MaterialPageRoute(
-                  //         builder: (ctx) => VerticalVideoListScreen()));
-                  //   },
-                  //   icon: Icon(Icons.kayaking),
-                  // ),
-                  // Switch(
-                  //   value: isSwitchOn,
-                  //   onChanged: _toggleWindowSize, // Bascule entre les modes
-                  // ),
-                  // buildIconButtonClearQrCodes(),
-
-                  // Switch pour basculer entre les thèmes
-                  // Center(
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Icon(
-                  //         isDemoLicense ? Icons.verified_user : Icons.verified,
-                  //         color: isDemoLicense ? Colors.green : Colors.orange,
-                  //       ),
-                  //       Text(
-                  //         '$remainingDays',
-                  //         style: TextStyle(fontSize: 18),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-
-                  // IconButton(
-                  //   onPressed: () {
-                  //     Navigator.of(context).push(
-                  //         MaterialPageRoute(builder: (ctx) => MyHomePageAds()));
-                  //   },
-                  //   icon: Icon(Icons.ads_click, color: Colors.deepPurple),
-                  // ),
-                  // IconButton(
-                  //   onPressed: () {
-                  //     // Appelez la méthode ici sans essayer d'utiliser sa valeur de retour
-                  //     widget.objectBox..ajouterQuantitesAleatoires();
-                  //   },
-                  //  icon: Icon(Icons.qr_code_scanner, color: Colors.blue),
-                  // ),
-
-                  // IconButton(
-                  //   onPressed: () {
-                  //     Navigator.of(context).push(MaterialPageRoute(
-                  //         builder: (ctx) => mobile_scanner_example()));
-                  //   },
-                  //   icon: Icon(Icons.home, color: Colors.black),
-                  // ),
-                  // IconButton(
-                  //   onPressed: () {
-                  //     Navigator.of(context).push(MaterialPageRoute(
-                  //         builder: (ctx) => QRScannerPage(
-                  //               lengthPin: 8,
-                  //               p4ssw0rd: 'Oran2024',
-                  //             )));
-                  //   },
-                  //   icon: Icon(Icons.qr_code_scanner, color: Colors.blue),
-                  // ),
                 ],
               ),
               body: Consumer<CommerceProvider>(
@@ -1472,6 +1415,28 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                 },
               ),
             ),
+          );
+        }
+      },
+    );
+  }
+
+  FutureBuilder<int> buildFutureBuilderLicenceCheckerRemainder() {
+    return FutureBuilder<int>(
+      future: _getRemainingDays(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasData && snapshot.data! >= 0) {
+          return Text(
+            "Jours restants: ${snapshot.data}",
+            style: TextStyle(fontSize: 18, color: Colors.green),
+          );
+        } else {
+          return Text(
+            '',
+            // "Licence expirée ou invalide TEST",
+            style: TextStyle(fontSize: 18, color: Colors.red),
           );
         }
       },
@@ -1612,7 +1577,6 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     ),
                   ),
                 ),
-
                 // Expanded(
                 //   child: CardAlert(
                 //     image: 'https://picsum.photos/seed/${randomId + 2}/200/100',
@@ -1949,6 +1913,19 @@ class _adaptiveHomeState extends State<adaptiveHome> {
         ],
       ),
     );
+  }
+
+  Future<int> _getRemainingDays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final expiresAtString = prefs.getString('licenseExpiresAt');
+
+    if (expiresAtString != null) {
+      final expiresAt = DateTime.parse(expiresAtString);
+      final now = DateTime.now();
+      return expiresAt.difference(now).inDays;
+    }
+
+    return -1; // Aucune licence valide trouvée
   }
 
 // Future<void> _toggleWindowSize(bool value) async {
@@ -2417,208 +2394,4 @@ void _navigateToNextScreen(BuildContext context, Widget destinationPage) {
   Navigator.of(context).push(MaterialPageRoute(
     builder: (context) => destinationPage,
   ));
-}
-
-class ConnectionStatusIndicator extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final statusProvider = Provider.of<ConnectionStatusProvider>(context);
-
-    return Row(
-      children: [
-        IconButton(
-          icon: Icon(
-            statusProvider.isOnline ? Icons.cloud_done : Icons.cloud_off,
-            color: statusProvider.isBlocked
-                ? Colors.red
-                : statusProvider.isOnline
-                    ? Colors.green
-                    : Colors.orange,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (ctx) => LicenseCheckScreen()));
-          },
-        ),
-        if (!statusProvider.isOnline)
-          Text(
-            statusProvider.remainingTime,
-            style: TextStyle(
-              color: statusProvider.isBlocked ? Colors.red : Colors.orange,
-              fontSize: 12,
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class LicenseCheckScreen extends StatefulWidget {
-  @override
-  _LicenseCheckScreenState createState() => _LicenseCheckScreenState();
-}
-
-class _LicenseCheckScreenState extends State<LicenseCheckScreen> {
-  bool _isLoading = true;
-  bool _isOnline = false;
-  bool _isOfflineForMoreThan2Days = false;
-  Duration _offlineDuration = Duration.zero;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkInternetConnection();
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel(); // Annuler le timer pour éviter les fuites de mémoire
-    super.dispose();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      final prefs = await SharedPreferences.getInstance();
-      final lastOnlineCheckString = prefs.getString('lastOnlineCheck');
-
-      if (lastOnlineCheckString != null) {
-        final lastOnlineCheck = DateTime.parse(lastOnlineCheckString);
-        final now = DateTime.now();
-        setState(() {
-          _offlineDuration = now.difference(lastOnlineCheck);
-          _isOfflineForMoreThan2Days = _offlineDuration.inDays >= 2;
-        });
-      }
-    });
-  }
-
-  Future<void> _checkInternetConnection() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-
-    if (connectivityResult == ConnectivityResult.none) {
-      // Pas de connexion Internet
-      final prefs = await SharedPreferences.getInstance();
-      final lastOnlineCheckString = prefs.getString('lastOnlineCheck');
-
-      if (lastOnlineCheckString != null) {
-        final lastOnlineCheck = DateTime.parse(lastOnlineCheckString);
-        final now = DateTime.now();
-        setState(() {
-          _offlineDuration = now.difference(lastOnlineCheck);
-          _isOfflineForMoreThan2Days = _offlineDuration.inDays >= 2;
-        });
-      }
-
-      setState(() {
-        _isOnline = false;
-        _isLoading = false;
-      });
-    } else {
-      // Connexion Internet disponible
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-          'lastOnlineCheck', DateTime.now().toIso8601String());
-
-      setState(() {
-        _isOnline = true;
-        _isOfflineForMoreThan2Days = false;
-        _isLoading = false;
-      });
-    }
-  }
-
-  String _formatDuration(Duration duration) {
-    final days = duration.inDays;
-    final hours = duration.inHours % 24;
-    final minutes = duration.inMinutes % 60;
-    final seconds = duration.inSeconds % 60;
-
-    return '$days jours, $hours heures, $minutes minutes, $seconds secondes';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (!_isOnline) {
-      final remainingDuration = Duration(days: 2) - _offlineDuration;
-      final remainingTime = remainingDuration.isNegative
-          ? 'Temps écoulé'
-          : _formatDuration(remainingDuration);
-
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _isOfflineForMoreThan2Days ? '🚫' : '📵',
-                style: TextStyle(fontSize: 100),
-              ),
-              SizedBox(height: 20),
-              Text(
-                _isOfflineForMoreThan2Days
-                    ? 'Connexion interrompue depuis plus de 2 jours'
-                    : 'Pas de connexion Internet',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                _isOfflineForMoreThan2Days
-                    ? 'Veuillez vous reconnecter à Internet\npour continuer à utiliser l\'application.'
-                    : 'Vous êtes hors ligne depuis :\n${_formatDuration(_offlineDuration)}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.grey[700],
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                _isOfflineForMoreThan2Days
-                    ? ''
-                    : 'Temps restant avant blocage :\n$remainingTime',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.blue[700],
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: _checkInternetConnection,
-                    child: Text('Réessayer'),
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('Retour'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    } else {
-      return FuturisticConnectionUI();
-    }
-  }
 }

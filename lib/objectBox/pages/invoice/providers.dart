@@ -1,11 +1,8 @@
-import 'dart:async';
 import 'dart:isolate';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../objectbox.g.dart';
 import '../../Entity.dart';
@@ -73,7 +70,7 @@ class FacturationProvider with ChangeNotifier {
 
   bool get hasMoreFactures => _hasMoreFactures;
 
-  Future<void> chargerFactures({bool reset = true}) async {
+  Future<void> chargerFactures({bool reset = false}) async {
     if (_isLoadingListFacture || !_hasMoreFactures) {
       print(
           "🚫 Appel ignoré : _isLoadingListFacture = $_isLoadingListFacture, _hasMoreFactures = $_hasMoreFactures");
@@ -173,8 +170,8 @@ class FacturationProvider with ChangeNotifier {
     }
   }
 
-  void setImpayer(double impayer) {
-    _impayer = impayer;
+  void setImpayer(double value) {
+    _impayer = value;
     // _isEditing = true;
     _hasChanges = true;
     notifyListeners();
@@ -598,70 +595,4 @@ class DocumentFilterOptions {
     this.type,
     this.isSynced,
   });
-}
-
-class ConnectionStatusProvider extends ChangeNotifier {
-  bool _isOnline = true;
-  bool _isBlocked = false;
-  Duration _offlineDuration = Duration.zero;
-  Timer? _timer;
-
-  bool get isOnline => _isOnline;
-
-  bool get isBlocked => _isBlocked;
-
-  String get remainingTime => _formatRemainingTime();
-
-  Duration get offlineDuration => _offlineDuration;
-
-  ConnectionStatusProvider() {
-    _init();
-  }
-
-  Future<void> _init() async {
-    await checkInternetConnection();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      await checkInternetConnection();
-      notifyListeners();
-    });
-  }
-
-  Future<void> checkInternetConnection() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-    final prefs = await SharedPreferences.getInstance();
-
-    if (connectivityResult == ConnectivityResult.none) {
-      final lastOnline = prefs.getString('lastOnlineCheck');
-      if (lastOnline != null) {
-        _offlineDuration =
-            DateTime.now().difference(DateTime.parse(lastOnline));
-        _isBlocked = _offlineDuration.inDays >= 2;
-      }
-      _isOnline = false;
-    } else {
-      await prefs.setString(
-          'lastOnlineCheck', DateTime.now().toIso8601String());
-      _isOnline = true;
-      _isBlocked = false;
-      _offlineDuration = Duration.zero;
-    }
-  }
-
-  String _formatRemainingTime() {
-    if (_isOnline) return "Connecté";
-    final remaining = Duration(days: 2) - _offlineDuration;
-    return remaining.isNegative
-        ? "Blocage actif"
-        : "${remaining.inHours}h ${remaining.inMinutes.remainder(60)}m";
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
 }

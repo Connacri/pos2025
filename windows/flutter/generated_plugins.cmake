@@ -5,13 +5,9 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   cloud_firestore
-  connectivity_plus
   file_selector_windows
-  firebase_auth
   firebase_core
   firebase_storage
-  flutter_avif_windows
-  flutter_inappwebview_windows
   objectbox_flutter_libs
   permission_handler_windows
   screen_retriever_windows

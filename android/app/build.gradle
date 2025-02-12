@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application'
+    id "com.android.application"
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
@@ -12,12 +12,12 @@ android {
     ndkVersion = "25.1.8937393"//flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
@@ -46,38 +46,22 @@ flutter {
 }
 dependencies {
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:33.8.0')
-//    implementation 'com.google.android.gms:play-services-ads:23.6.0'
-//    implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
-    implementation 'com.google.firebase:firebase-analytics'
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+
+
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
-//    implementation("com.google.firebase:firebase-analytics")
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-//    implementation 'androidx.core:core-ktx:1.15.0'
-//    implementation 'androidx.appcompat:appcompat:1.7.0'
-//    implementation 'com.google.android.material:material:1.12.0'
-//    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
-
-    // Dépendances Firebase
-    implementation 'com.google.firebase:firebase-analytics' // Analytics (optionnel)
-    implementation 'com.google.firebase:firebase-firestore' // Firestore (si utilisé)
-    implementation 'com.google.firebase:firebase-auth' // Authentication (si utilisé)
-    implementation 'com.google.firebase:firebase-storage' // Storage (si u
-//    implementation("com.google.android.gms:play-services-ads:23.1.0") {
-//        exclude group: 'org.bouncycastle', module: 'bcprov-jdk18on'
-//    }
-//    implementation 'org.bouncycastle:bcprov-jdk18on:1.76'
+    implementation("com.google.firebase:firebase-analytics")
 //
 //    implementation 'com.bytedance.ies.ugc.aweme:opensdk-china-external:0.1.9.6'
 //    implementation 'com.bytedance.ies.ugc.aweme:opensdk-common:0.1.9.6'
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
-//}
+}
 //dependencies {
 //    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
 //    implementation "androidx.core:core-ktx:1.15.0"
-//    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+//    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 //    implementation("com.google.firebase:firebase-auth")
 //    implementation("com.google.android.gms:play-services-base:18.5.0")
 //    implementation("com.google.firebase:firebase-analytics")
@@ -85,4 +69,4 @@ dependencies {
 //    implementation("io.objectbox:objectbox-java:4.0.3")
 //    implementation("io.objectbox:objectbox-android:4.0.3")
 //    debugImplementation("io.objectbox:objectbox-android-objectbrowser:4.0.3")
-}
+//}
