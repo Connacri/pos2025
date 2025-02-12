@@ -34,7 +34,7 @@ class CommerceProvider extends ChangeNotifier {
   List<Approvisionnement> _approvisionnementTemporaire = [];
   List<Client> _clients = [];
   int _currentPage = 0;
-  final int _pageSize = 100;
+  final int _pageSize = 30;
   bool _hasMoreProduits = true;
   bool _isLoading = false;
 
@@ -62,6 +62,49 @@ class CommerceProvider extends ChangeNotifier {
     getClientsFromBox();
   }
 
+  // Future<void> chargerProduits({bool reset = false}) async {
+  //   // Empêche les appels multiples simultanés
+  //   if (_isLoading) return;
+  //   _isLoading = true;
+  //   notifyListeners();
+  //
+  //   // Réinitialiser la pagination si nécessaire
+  //   if (reset) {
+  //     _currentPage = 0;
+  //     produits.clear();
+  //   }
+  //
+  //   final query = _objectBox.produitBox
+  //       .query()
+  //       .order(Produit_.id, flags: Order.descending)
+  //       .build()
+  //     ..offset = _currentPage * _pageSize
+  //     ..limit = _pageSize;
+  //
+  //   final allProduits = await query.find();
+  //   produits.addAll(allProduits);
+  //   // Gérer la pagination
+  //   final startIndex = _currentPage * _pageSize;
+  //   final endIndex = startIndex + _pageSize;
+  //
+  //   if (startIndex >= allProduits.length) {
+  //     _hasMoreProduits = false;
+  //   } else {
+  //     // Sous-liste des nouveaux produits à ajouter
+  //     final newProduits = allProduits.sublist(
+  //       startIndex,
+  //       endIndex > allProduits.length ? allProduits.length : endIndex,
+  //     );
+  //
+  //     // Ajouter les nouveaux produits sans restructurer
+  //     produits.addAll(newProduits);
+  //     _currentPage++;
+  //     _hasMoreProduits = endIndex < allProduits.length;
+  //   }
+  //
+  //   _isLoading = false;
+  //   notifyListeners();
+  // }
   Future<void> chargerProduits({bool reset = false}) async {
     // Empêche les appels multiples simultanés
     if (_isLoading) return;
@@ -72,14 +115,10 @@ class CommerceProvider extends ChangeNotifier {
     if (reset) {
       _currentPage = 0;
       produits.clear();
+      _hasMoreProduits = true; // Réinitialiser pour une nouvelle pagination
     }
 
-    // // Créer la requête pour récupérer les produits triés par ID descendant
-    // final query = _objectBox.produitBox.query()
-    //   ..order(Produit_.id, flags: Order.descending);
-    //
-    // // Récupérer tous les produits
-    // final allProduits = await query.build().find();
+    // Créer la requête pour récupérer les produits triés par ID descendant
     final query = _objectBox.produitBox
         .query()
         .order(Produit_.id, flags: Order.descending)
@@ -88,25 +127,17 @@ class CommerceProvider extends ChangeNotifier {
           _currentPage * _pageSize // Ignorer les produits des pages précédentes
       ..limit = _pageSize; // Limiter le nombre de produits récupérés
 
-    final allProduits = await query.find();
-    produits.addAll(allProduits);
-    // Gérer la pagination
-    final startIndex = _currentPage * _pageSize;
-    final endIndex = startIndex + _pageSize;
+    // Récupérer les produits paginés
+    final newProduits = await query.find();
 
-    if (startIndex >= allProduits.length) {
-      _hasMoreProduits = false;
+    // Ajouter les nouveaux produits à la liste
+    produits.addAll(newProduits);
+
+    // Mettre à jour la pagination
+    if (newProduits.length < _pageSize) {
+      _hasMoreProduits = false; // Plus de produits à charger
     } else {
-      // Sous-liste des nouveaux produits à ajouter
-      final newProduits = allProduits.sublist(
-        startIndex,
-        endIndex > allProduits.length ? allProduits.length : endIndex,
-      );
-
-      // Ajouter les nouveaux produits sans restructurer
-      produits.addAll(newProduits);
-      _currentPage++;
-      _hasMoreProduits = endIndex < allProduits.length;
+      _currentPage++; // Passer à la page suivante
     }
 
     _isLoading = false;
@@ -192,6 +223,24 @@ class CommerceProvider extends ChangeNotifier {
     }
 
     return null; // Aucun produit trouvé avec le QR code donné
+  }
+
+  Future<Produit?> getProduitByQrFacture(String qrCode) async {
+    // Vérifier si le QR code commence par '1613' et le transformer si nécessaire
+    if (qrCode.startsWith('1613')) {
+      qrCode = '613' + qrCode.substring(4); // Remplace 1613 par 613
+    }
+
+    // Construire une requête pour trouver le produit correspondant
+    final query = _objectBox.produitBox.query(
+      Produit_.qr.contains(qrCode,
+          caseSensitive: false), // Recherche dans le champ 'qr'
+    );
+
+    // Exécuter la requête et récupérer le premier résultat
+    final result = await query.build().findFirst();
+
+    return result;
   }
 
   // Future<void> removeQRCodeFromProduit(int produitId, String qrCode) async {

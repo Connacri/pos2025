@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'dart:io';
 import 'package:path/path.dart' as path;
 import '../Entity.dart';
@@ -20,6 +20,7 @@ class AddFournisseurFormFromProduit extends StatefulWidget {
 
   AddFournisseurFormFromProduit({Key? key, required this.produit})
       : super(key: key);
+
   @override
   _AddFournisseurFormFromProduitState createState() =>
       _AddFournisseurFormFromProduitState();
@@ -48,9 +49,8 @@ class _AddFournisseurFormFromProduitState
       ),
       body: Padding(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context)
-              .viewInsets
-              .bottom, // Permet de remonter le BottomSheet lorsque le clavier apparaît
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          // Permet de remonter le BottomSheet lorsque le clavier apparaît
           left: 16,
           right: 16,
           top: 16,

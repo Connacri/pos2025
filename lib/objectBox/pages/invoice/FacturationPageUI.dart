@@ -18,6 +18,8 @@ import '../../MyProviders.dart';
 import '../../Utils/mobile_scanner/barcode_scanner_window.dart';
 import '../../Utils/winMobile.dart';
 import '../../classeObjectBox.dart';
+import '../../firebase/AddCarouselButton.dart';
+import '../../firebase/ItemsCarousel.dart';
 import '../ClientListScreen.dart';
 import '../addProduct.dart';
 import 'providers.dart';
@@ -85,7 +87,6 @@ class FacturationPageUI extends StatelessWidget {
                   child: FactureDetail(),
                 ),
                 Expanded(
-                  flex: 1,
                   child: FactureList(),
                 ),
               ],
@@ -1184,17 +1185,17 @@ class _FactureListState extends State<FactureList> {
       request: AdRequest(),
       listener: NativeAdListener(
         onAdLoaded: (Ad ad) {
-          print('$NativeAd loaded.');
+          // print('$NativeAd loaded.');
           setState(() {
             _nativeAdIsLoaded = true;
           });
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('$NativeAd failedToLoad: $error');
+          //     print('$NativeAd failedToLoad: $error');
           ad.dispose();
         },
-        onAdOpened: (Ad ad) => print('$NativeAd onAdOpened.'),
-        onAdClosed: (Ad ad) => print('$NativeAd onAdClosed.'),
+        // onAdOpened: (Ad ad) => print('$NativeAd onAdOpened.'),
+        // onAdClosed: (Ad ad) => print('$NativeAd onAdClosed.'),
       ),
       nativeTemplateStyle: NativeTemplateStyle(
         templateType: TemplateType.medium,
@@ -1218,13 +1219,13 @@ class _FactureListState extends State<FactureList> {
   }
 
   void _onScroll() {
-    print("🎯 Position actuelle : ${_scrollController.position.pixels}");
-    print(
-        "🎯 Position maximale : ${_scrollController.position.maxScrollExtent}");
+    // print("🎯 Position actuelle : ${_scrollController.position.pixels}");
+    // print(
+    //     "🎯 Position maximale : ${_scrollController.position.maxScrollExtent}");
 
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      print("📜 Début du chargement des factures supplémentaires...");
+      //  print("📜 Début du chargement des factures supplémentaires...");
       Provider.of<FacturationProvider>(context, listen: false)
           .chargerFactures();
     }
@@ -1237,167 +1238,192 @@ class _FactureListState extends State<FactureList> {
     return Scaffold(
       body: Consumer<FacturationProvider>(
         builder: (context, factureProvider, child) {
-          print(
-              "📊 Nombre de factures dans la liste : ${factureProvider.facturesList.length}");
-          print("🔄 _hasMoreFactures : ${factureProvider.hasMoreFactures}");
+          // print(
+          //     "📊 Nombre de factures dans la liste : ${factureProvider
+          //         .facturesList.length}");
+          // print("🔄 _hasMoreFactures : ${factureProvider.hasMoreFactures}");
           if (factureProvider.facturesList.isEmpty) {
             return Center(child: Text("Aucune facture disponible."));
           }
-          return ListView.builder(
-            controller: _scrollController,
-            itemCount: factureProvider.facturesList.length,
-            itemBuilder: (context, index) {
-              if (index != 0 &&
-                  index % 5 == 0 &&
-                  _nativeAd != null &&
-                  _nativeAdIsLoaded) {
-                return Align(
-                    alignment: Alignment.center,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minWidth: 300,
-                        minHeight: 350,
-                        maxHeight: 400,
-                        maxWidth: 450,
-                      ),
-                      child: AdWidget(ad: _nativeAd!),
-                    ));
-              }
-              if (index < factureProvider.facturesList.length) {
-                final facture =
-                    factureProvider.facturesList.reversed.toList()[index];
-                bool estEnEdition = factureProvider.estEnEdition(facture);
-                final isEditing = factureProvider.isEditing;
-                final hasChanges = factureProvider.hasChanges;
-                return Column(
-                  children: [
-                    Card(
-                      color: estEnEdition ? Colors.green.shade100 : null,
-                      child: ListTile(
-                        onLongPress: () =>
-                            factureProvider.supprimerFacture(facture),
-                        leading: CircleAvatar(
-                          backgroundColor:
-                              estEnEdition ? Colors.white70 : Colors.green,
-                          child: estEnEdition
-                              ? (isEditing && hasChanges
-                                  ? Icon(FontAwesomeIcons.penToSquare,
-                                      color: Colors.orange)
-                                  : Icon(FontAwesomeIcons.check,
-                                      color: Colors.green))
-                              : Icon(FontAwesomeIcons.check,
-                                  color: Colors.white70),
-                        ),
-                        title: Text(
-                          facture.qrReference,
-                          style: TextStyle(
-                            color: estEnEdition
-                                ? Colors
-                                    .black // Texte en noir si estEnEdition est true
-                                : Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors
-                                        .white // Texte en blanc en mode sombre
-                                    : Colors
-                                        .black, // Texte en noir en mode clair
-                          ),
-                        ),
-                        subtitle: Text.rich(
-                          overflow: TextOverflow.ellipsis,
-                          TextSpan(
-                            text: 'Client: ',
-                            style: TextStyle(
-                              color: estEnEdition
-                                  ? Colors
-                                      .black // Texte en noir si estEnEdition est true
-                                  : Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors
-                                          .white // Texte en blanc en mode sombre
-                                      : Colors
-                                          .black, // Texte en noir en mode clair
+          return Column(
+            children: [
+              Expanded(
+                flex: 3,
+                child: CarouselBanner(),
+              ),
+              // Expanded(flex: 4, child: YouTubeVideoApp()),
+              Expanded(
+                  child: ElevatedButton(
+                      onPressed: () =>
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (ctx) => CarouselForm(),
+                          )),
+                      child: Text('Ajouter Carousel'))),
+              Expanded(
+                flex: 8,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: factureProvider.facturesList.length,
+                  itemBuilder: (context, index) {
+                    if (index != 0 &&
+                        index % 5 == 0 &&
+                        _nativeAd != null &&
+                        _nativeAdIsLoaded) {
+                      return Align(
+                          alignment: Alignment.center,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minWidth: 300,
+                              minHeight: 350,
+                              maxHeight: 400,
+                              maxWidth: 450,
                             ),
-                            children: [
-                              TextSpan(
-                                text: facture.client.target?.nom ?? 'Inconnu',
-                                style: facture.client.target != null
-                                    ? TextStyle(
-                                        color: Colors.blue,
-                                        fontWeight: FontWeight.w400)
-                                    : TextStyle(
-                                        color: estEnEdition
-                                            ? Colors
-                                                .black // Texte en noir si estEnEdition est true
-                                            : Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? Colors
-                                                    .white // Texte en blanc en mode sombre
-                                                : Colors
-                                                    .black, // Texte en noir en mode clair
-                                      ),
+                            child: AdWidget(ad: _nativeAd!),
+                          ));
+                    }
+                    if (index < factureProvider.facturesList.length) {
+                      final facture =
+                          factureProvider.facturesList.reversed.toList()[index];
+                      bool estEnEdition = factureProvider.estEnEdition(facture);
+                      final isEditing = factureProvider.isEditing;
+                      final hasChanges = factureProvider.hasChanges;
+                      return Column(
+                        children: [
+                          Card(
+                            color: estEnEdition ? Colors.green.shade100 : null,
+                            child: ListTile(
+                              onLongPress: () =>
+                                  factureProvider.supprimerFacture(facture),
+                              leading: CircleAvatar(
+                                backgroundColor: estEnEdition
+                                    ? Colors.white70
+                                    : Colors.green,
+                                child: estEnEdition
+                                    ? (isEditing && hasChanges
+                                        ? Icon(FontAwesomeIcons.penToSquare,
+                                            color: Colors.orange)
+                                        : Icon(FontAwesomeIcons.check,
+                                            color: Colors.green))
+                                    : Icon(FontAwesomeIcons.check,
+                                        color: Colors.white70),
                               ),
-                            ],
-                          ),
-                        ),
-                        onTap: () {
-                          factureProvider.selectionnerFacture(facture);
-                          factureProvider.commencerEdition(facture);
-                          context
-                              .read<EditableFieldProvider>()
-                              .AlwaystoggleEditable();
-                          context
-                              .read<FacturationProvider>()
-                              .AlwaystoggleEdit(index);
-                          tabController?.animateTo(0);
-                        },
-                        trailing: facture.impayer! > 0.0
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '${facture.montantTotal.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: estEnEdition
+                              title: Text(
+                                facture.qrReference,
+                                style: TextStyle(
+                                  color: estEnEdition
+                                      ? Colors
+                                          .black // Texte en noir si estEnEdition est true
+                                      : Theme.of(context).brightness ==
+                                              Brightness.dark
                                           ? Colors
-                                              .black // Texte en noir si estEnEdition est true
-                                          : Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors
-                                                  .white // Texte en blanc en mode sombre
-                                              : Colors
-                                                  .black, // Texte en noir en mode clair
-                                    ),
-                                  ),
-                                  Text(
-                                    '${facture.impayer!.toStringAsFixed(2)}',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              )
-                            : Text(
-                                '${facture.montantTotal.toStringAsFixed(2)}',
-                                style: TextStyle(fontSize: 20),
+                                              .white // Texte en blanc en mode sombre
+                                          : Colors
+                                              .black, // Texte en noir en mode clair
+                                ),
                               ),
-                      ),
-                    ),
-                    Text(
-                      DateFormat('EEE dd MMM yyyy  -  HH:mm', 'fr')
-                          .format(DateTime.parse(facture.date.toString()))
-                          .capitalize(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                  ],
-                );
-              } else if (factureProvider.hasMoreFactures) {
-                return Center(child: CircularProgressIndicator());
-              } else {
-                return SizedBox.shrink();
-              }
-            },
+                              subtitle: Text.rich(
+                                overflow: TextOverflow.ellipsis,
+                                TextSpan(
+                                  text: 'Client: ',
+                                  style: TextStyle(
+                                    color: estEnEdition
+                                        ? Colors
+                                            .black // Texte en noir si estEnEdition est true
+                                        : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors
+                                                .white // Texte en blanc en mode sombre
+                                            : Colors
+                                                .black, // Texte en noir en mode clair
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: facture.client.target?.nom ??
+                                          'Inconnu',
+                                      style: facture.client.target != null
+                                          ? TextStyle(
+                                              color: Colors.blue,
+                                              fontWeight: FontWeight.w400)
+                                          : TextStyle(
+                                              color: estEnEdition
+                                                  ? Colors
+                                                      .black // Texte en noir si estEnEdition est true
+                                                  : Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark
+                                                      ? Colors
+                                                          .white // Texte en blanc en mode sombre
+                                                      : Colors
+                                                          .black, // Texte en noir en mode clair
+                                            ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              onTap: () {
+                                factureProvider.selectionnerFacture(facture);
+                                factureProvider.commencerEdition(facture);
+                                context
+                                    .read<EditableFieldProvider>()
+                                    .AlwaystoggleEditable();
+                                context
+                                    .read<FacturationProvider>()
+                                    .AlwaystoggleEdit(index);
+                                tabController?.animateTo(0);
+                              },
+                              trailing: facture.impayer! > 0.0
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          '${facture.montantTotal.toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            color: estEnEdition
+                                                ? Colors
+                                                    .black // Texte en noir si estEnEdition est true
+                                                : Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? Colors
+                                                        .white // Texte en blanc en mode sombre
+                                                    : Colors
+                                                        .black, // Texte en noir en mode clair
+                                          ),
+                                        ),
+                                        Text(
+                                          '${facture.impayer!.toStringAsFixed(2)}',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      '${facture.montantTotal.toStringAsFixed(2)}',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                            ),
+                          ),
+                          Text(
+                            DateFormat('EEE dd MMM yyyy  -  HH:mm', 'fr')
+                                .format(DateTime.parse(facture.date.toString()))
+                                .capitalize(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else if (factureProvider.hasMoreFactures) {
+                      return Center(child: CircularProgressIndicator());
+                    } else {
+                      return SizedBox.shrink();
+                    }
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -2040,17 +2066,15 @@ class TotalDetail extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              '${_localImpayer.toStringAsFixed(2)} DZD',
-                              textAlign: TextAlign.end,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.deepOrange,
-                                fontSize: fontSize,
-                              ),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '${_localImpayer.toStringAsFixed(2)} DZD',
+                            textAlign: TextAlign.end,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.deepOrange,
+                              fontSize: fontSize,
                             ),
                           ),
                         ),
@@ -2221,7 +2245,7 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ProductSearchField1(
+      child: ProductSearchField(
         widget.barcodeBufferController,
         (context, commerceProvider, cartProvider, enteredQuantity,
             lignesDocument) {
@@ -2246,7 +2270,7 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
   ) async {
     if (widget.barcodeBuffer.isNotEmpty) {
       final produit =
-          await commerceProvider.getProduitByQr(widget.barcodeBuffer);
+          await commerceProvider.getProduitByQrFacture(widget.barcodeBuffer);
 
       if (produit == null) {
         _navigateToAddProductPage(
@@ -2254,12 +2278,12 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
       } else {
         facturationProvider.ajouterProduitALaFacture(
             produit, enteredQuantity, produit.prixVente);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Produit ajouté : ${produit.nom}'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Produit ajouté : ${produit.nom}'),
+        //     backgroundColor: Colors.green,
+        //   ),
+        // );
       }
     }
   }
@@ -2279,29 +2303,44 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
 
     if (result != null && result is Produit) {
       facturationProvider.ajouterProduitALaFacture(result, 1, result.prixVente);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Nouveau produit ajouté : ${result.nom}'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Nouveau produit ajouté : ${result.nom}'),
+      //     backgroundColor: Colors.green,
+      //   ),
+      // );
     }
   }
 }
 
-class ProductSearchField1 extends StatefulWidget {
+class ProductSearchField extends StatefulWidget {
   final TextEditingController _barcodeBufferController;
   final Function(BuildContext, CommerceProvider, FacturationProvider, double,
       List<LigneDocument>) _processBarcode;
 
-  ProductSearchField1(this._barcodeBufferController, this._processBarcode);
+  ProductSearchField(this._barcodeBufferController, this._processBarcode);
 
   @override
-  State<ProductSearchField1> createState() => _ProductSearchField1State();
+  State<ProductSearchField> createState() => _ProductSearchField1State();
 }
 
-class _ProductSearchField1State extends State<ProductSearchField1> {
+class _ProductSearchField1State extends State<ProductSearchField> {
   bool isPasted = false;
+  late FocusNode _focusNode; // Déclarer un FocusNode
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode(); // Initialiser le FocusNode
+    _focusNode.requestFocus(); // Demander le focus au chargement
+  }
+
+  @override
+  void dispose() {
+    _focusNode
+        .dispose(); // Nettoyer le FocusNode lors de la suppression du widget
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2324,6 +2363,8 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
         return TextFormField(
           controller: fieldTextEditingController,
           focusNode: fieldFocusNode,
+          // focusNode: _focusNode,
+          // Utiliser notre FocusNode personnalisé
           inputFormatters: [
             TextInputFormatter.withFunction((oldValue, newValue) {
               // Détecter si c'est un collage en comparant les longueurs
@@ -2332,8 +2373,8 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
                 // Traiter le texte collé de manière asynchrone
                 Future.microtask(() async {
                   if (newValue.text.isNotEmpty) {
-                    final produit =
-                        await commerceProvider.getProduitByQr(newValue.text);
+                    final produit = await commerceProvider
+                        .getProduitByQrFacture(newValue.text);
                     if (produit != null) {
                       facturationProvider.ajouterProduitALaFacture(
                         produit,
@@ -2343,12 +2384,12 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
                       fieldTextEditingController.clear();
 
                       // Optionnel : Afficher un message de confirmation
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${produit.nom} ajouté à la facture'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content: Text('${produit.nom} ajouté à la facture'),
+                      //     backgroundColor: Colors.green,
+                      //   ),
+                      // );
                     }
                     setState(() {
                       isPasted = false;
@@ -2362,36 +2403,82 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
           decoration: InputDecoration(
             labelText: 'Code Produit (ID ou QR)',
             border: OutlineInputBorder(),
-            suffixIcon: IconButton(
-              icon: Icon(Icons.search),
-              onPressed: onFieldSubmitted,
-            ),
-            // prefixIcon: (Platform.isIOS || Platform.isAndroid)
-            //     ? IconButton(
-            //   icon: Icon(Icons.qr_code_scanner),
-            //   onPressed: _scanQRCodeFacture,
-            // )
-            //   : null,
+            // suffixIcon: IconButton(
+            //   icon: Icon(Icons.search),
+            //   onPressed: onFieldSubmitted,
+            // ),
+            suffixIcon: (Platform.isIOS || Platform.isAndroid)
+                ? IconButton(
+                    icon: Icon(Icons.qr_code_scanner),
+                    onPressed: () async {
+                      await scanQRCode(commerceProvider, facturationProvider,
+                          fieldTextEditingController);
+                    },
+                  )
+                : null,
           ),
           // La méthode onChanged ne fait plus rien d'automatique
           onChanged: (value) {
             // Ne rien faire ici, juste laisser l'autocomplétion fonctionner
           },
-          onFieldSubmitted: (value) {
+          // onFieldSubmitted: (value) {
+          //   if (value.isNotEmpty) {
+          //     widget._processBarcode(
+          //       context,
+          //       commerceProvider,
+          //       facturationProvider,
+          //       1,
+          //       facturationProvider.lignesFacture,
+          //     );
+          //     fieldTextEditingController.clear();
+          //   } else {
+          //     ScaffoldMessenger.of(context).showSnackBar(
+          //       SnackBar(
+          //         content:
+          //             Text('Entrée invalide. Veuillez entrer un code valide.'),
+          //       ),
+          //     );
+          //   }
+          // },
+          onFieldSubmitted: (value) async {
             if (value.isNotEmpty) {
-              widget._processBarcode(
-                context,
-                commerceProvider,
-                facturationProvider,
-                1,
-                facturationProvider.lignesFacture,
-              );
+              // Récupérer le produit par QR code
+              final produit =
+                  await commerceProvider.getProduitByQrFacture(value);
+
+              if (produit != null) {
+                // Ajouter le produit à la facture
+                facturationProvider.ajouterProduitALaFacture(
+                    produit, 1, produit.prixVente);
+
+                // Afficher un message de confirmation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${produit.nom} ajouté à la facture'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                // Aucun produit trouvé
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Aucun produit trouvé pour ce QR code.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+
+              // Vider le champ après l'ajout
               fieldTextEditingController.clear();
+
+              // Rétablir le focus sur le champ
+              _focusNode.requestFocus();
             } else {
+              // Afficher un message d'erreur si le champ est vide
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content:
-                      Text('Entrée invalide. Veuillez entrer un code valide.'),
+                  content: Text('Veuillez entrer un code valide.'),
+                  backgroundColor: Colors.red,
                 ),
               );
             }
@@ -2460,30 +2547,255 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
     );
   }
 
-// Future<void> _scanQRCodeFacture() async {
-//   // Simuler un scan de QR code pour tester
-//   final code = await Navigator.of(context).push<String>(
-//     MaterialPageRoute(
-//       builder: (context) => BarcodeScannerWithScanWindow(), //QRViewExample(),
-//     ),
-//   );
-//   final provider = Provider.of<CommerceProvider>(context, listen: false);
-//   final produit = await provider.getProduitByQr(code!);
+  Future<void> scanQRCode(
+      commerceProvider, facturationProvider, fieldTextEditingController) async {
+    // Simuler un scan de QR code pour tester
+    final code = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => BarcodeScannerWithScanWindow(), //QRViewExample(),
+      ),
+    );
+    final provider = Provider.of<CommerceProvider>(context, listen: false);
+    final produit = await provider.getProduitByQrFacture(code!);
+    if (produit == null) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (ctx) => addProduct()));
+    } else {
+      // Récupérer le produit par QR code
+      final produit = await commerceProvider.getProduitByQrFacture(code);
+
+      if (produit != null) {
+        // Ajouter le produit à la facture
+        facturationProvider.ajouterProduitALaFacture(
+            produit, 1, produit.prixVente);
+
+        // Afficher un message de confirmation
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${produit.nom} ajouté à la facture'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        // Aucun produit trouvé
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Aucun produit trouvé pour ce QR code.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      // Vider le champ après l'ajout
+      fieldTextEditingController.clear();
+
+      // Rétablir le focus sur le champ
+      _focusNode.requestFocus();
+    }
+    // Rediriger le focus vers le TextFormField après l'ajout
+    FocusScope.of(context).requestFocus(_focusNode);
+  }
+}
+
 //
-//   // Rediriger le focus vers le TextFormField après l'ajout
-//   FocusScope.of(context).requestFocus(_serialFocusNode);
+// class CarouselBanner extends StatefulWidget {
+//   const CarouselBanner({super.key});
 //
-//   if (produit == null) {
-//     if (code.isNotEmpty && !_qrCodesTemp.contains(code)) {
-//       setState(() {
-//         _qrCodesTemp.add(code);
-//         _serialController.clear();
-//         _searchQr = false;
-//       });
-//     } else {
-//       _serialController.clear();
+//   @override
+//   State<CarouselBanner> createState() => _CarouselBannerState();
+// }
+//
+// class _CarouselBannerState extends State<CarouselBanner> {
+//   final CarouselController controller = CarouselController(initialItem: 1);
+//   bool _isDragging = false;
+//   Offset? _lastPosition;
+//   late Timer _timer;
+//   final double scrollSpeed = 30.0; // Décalage en pixels par step
+//   final Duration scrollDuration = Duration(milliseconds: 800);
+//   final Duration interval = Duration(seconds: 3);
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _startAutoScroll();
+//   }
+//
+//   void _startAutoScroll() {
+//     _timer = Timer.periodic(interval, (Timer timer) {
+//       if (controller.hasClients) {
+//         double nextOffset = controller.offset + scrollSpeed;
+//
+//         if (nextOffset >= controller.position.maxScrollExtent) {
+//           // ⚡ Instantanément revenir au début (évite un effet de transition visible)
+//           controller.jumpTo(0.0);
+//         } else {
+//           // 🔄 Défilement fluide
+//           controller.animateTo(
+//             nextOffset,
+//             duration: scrollDuration,
+//             curve: Curves.easeInOut,
+//           );
+//         }
+//       }
+//     });
+//   }
+//
+//   @override
+//   void dispose() {
+//     controller.dispose();
+//     _timer.cancel();
+//     super.dispose();
+//   }
+//
+//   void _handleDragStart(Offset position) {
+//     _isDragging = true;
+//     _lastPosition = position;
+//   }
+//
+//   void _handleDragEnd(Offset position) {
+//     _isDragging = false;
+//     _lastPosition = null;
+//   }
+//
+//   void _handleDragUpdate(Offset position) {
+//     if (!_isDragging || _lastPosition == null) return;
+//
+//     final double dx = position.dx - _lastPosition!.dx;
+//     final double dy = position.dy - _lastPosition!.dy;
+//
+//     if (controller.hasClients) {
+//       controller.jumpTo(
+//         (controller.offset - dx).clamp(
+//           0.0,
+//           controller.position.maxScrollExtent,
+//         ),
+//       );
 //     }
-//     FocusScope.of(context).requestFocus(_serialFocusNode);
+//
+//     _lastPosition = position;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final double height = MediaQuery.sizeOf(context).height;
+//
+//     return MouseRegion(
+//       cursor:
+//           _isDragging ? SystemMouseCursors.grabbing : SystemMouseCursors.grab,
+//       child: Listener(
+//         onPointerDown: (event) => _handleDragStart(event.position),
+//         onPointerUp: (event) => _handleDragEnd(event.position),
+//         onPointerMove: (event) => _handleDragUpdate(event.position),
+//         child: ConstrainedBox(
+//           constraints: BoxConstraints(maxHeight: height / 2),
+//           child: CarouselView.weighted(
+//             controller: controller,
+//             //itemSnapping: true,
+//             flexWeights: const <int>[1, 7, 1],
+//             children: ImageInfo.values.map((ImageInfo image) {
+//               return HeroLayoutCard(imageInfo: image);
+//             }).toList(),
+//           ),
+//         ),
+//       ),
+//     );
 //   }
 // }
-}
+//
+// class HeroLayoutCard extends StatelessWidget {
+//   const HeroLayoutCard({
+//     super.key,
+//     required this.imageInfo,
+//   });
+//
+//   final ImageInfo imageInfo;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final double width = MediaQuery.sizeOf(context).width;
+//     return Stack(
+//         alignment: AlignmentDirectional.bottomStart,
+//         children: <Widget>[
+//           ClipRect(
+//             child: OverflowBox(
+//               maxWidth: width * 7 / 8,
+//               minWidth: width * 7 / 8,
+//               child: Image(
+//                 fit: BoxFit.cover,
+//                 image: NetworkImage(
+//                     'https://flutter.github.io/assets-for-api-docs/assets/material/${imageInfo.url}'),
+//               ),
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(18.0),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               mainAxisSize: MainAxisSize.min,
+//               children: <Widget>[
+//                 Text(
+//                   imageInfo.title,
+//                   overflow: TextOverflow.clip,
+//                   softWrap: false,
+//                   style: Theme.of(context)
+//                       .textTheme
+//                       .headlineLarge
+//                       ?.copyWith(color: Colors.white),
+//                 ),
+//                 const SizedBox(height: 10),
+//                 Text(
+//                   imageInfo.subtitle,
+//                   overflow: TextOverflow.clip,
+//                   softWrap: false,
+//                   style: Theme.of(context)
+//                       .textTheme
+//                       .bodyMedium
+//                       ?.copyWith(color: Colors.white),
+//                 )
+//               ],
+//             ),
+//           ),
+//         ]);
+//   }
+// }
+//
+// enum CardInfo {
+//   camera('Cameras', Icons.video_call, Color(0xff2354C7), Color(0xffECEFFD)),
+//   lighting('Lighting', Icons.lightbulb, Color(0xff806C2A), Color(0xffFAEEDF)),
+//   climate('Climate', Icons.thermostat, Color(0xffA44D2A), Color(0xffFAEDE7)),
+//   wifi('Wifi', Icons.wifi, Color(0xff417345), Color(0xffE5F4E0)),
+//   media('Media', Icons.library_music, Color(0xff2556C8), Color(0xffECEFFD)),
+//   security(
+//       'Security', Icons.crisis_alert, Color(0xff794C01), Color(0xffFAEEDF)),
+//   safety(
+//       'Safety', Icons.medical_services, Color(0xff2251C5), Color(0xffECEFFD)),
+//   more('', Icons.add, Color(0xff201D1C), Color(0xffE3DFD8));
+//
+//   const CardInfo(this.label, this.icon, this.color, this.backgroundColor);
+//
+//   final String label;
+//   final IconData icon;
+//   final Color color;
+//   final Color backgroundColor;
+// }
+//
+// enum ImageInfo {
+//   image0('The Flow', 'Sponsored | Season 1 Now Streaming',
+//       'content_based_color_scheme_1.png'),
+//   image1('Through the Pane', 'Sponsored | Season 1 Now Streaming',
+//       'content_based_color_scheme_2.png'),
+//   image2('Iridescence', 'Sponsored | Season 1 Now Streaming',
+//       'content_based_color_scheme_3.png'),
+//   image3('Sea Change', 'Sponsored | Season 1 Now Streaming',
+//       'content_based_color_scheme_4.png'),
+//   image4('Blue Symphony', 'Sponsored | Season 1 Now Streaming',
+//       'content_based_color_scheme_5.png'),
+//   image5('When It Rains', 'Sponsored | Season 1 Now Streaming',
+//       'content_based_color_scheme_6.png');
+//
+//   const ImageInfo(this.title, this.subtitle, this.url);
+//
+//   final String title;
+//   final String subtitle;
+//   final String url;
+// }

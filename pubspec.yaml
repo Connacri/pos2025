@@ -13,30 +13,41 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  cloud_firestore: ^5.6.0
-  firebase_messaging: ^15.1.6
-  firebase_database: ^11.2.0
-  firebase_core: ^3.9.0
-  #  mochkil___rah_________hna________yebda
-  firebase_storage: ^12.3.7
-  firebase_in_app_messaging: ^0.8.0+11
-  firebase_analytics: ^11.3.6
+  cloud_firestore: ^5.6.3
+  firebase_messaging: ^15.2.2
+  firebase_database: ^11.3.2
+  firebase_core: ^3.11.0
+  firebase_auth: ^5.4.2
+  firebase_storage: any
+  firebase_in_app_messaging: ^0.8.1+2
+  firebase_analytics: any
   google_sign_in: ^6.2.2
+  #  cloud_firestore: ^5.6.0
+  #  firebase_messaging: ^15.1.6
+  #  firebase_database: ^11.2.0
+  #  firebase_core: ^3.9.0
+  #  mochkil___rah_________hna________yebda
+  #  firebase_storage: ^12.3.7
+  #  firebase_in_app_messaging: ^0.8.0+11
+  #  firebase_analytics: ^11.3.6
+  #  google_sign_in: ^6.2.2
   #  mochkil___rah_________hna________yekmel
   cached_network_image: ^3.4.1
+  supabase_flutter: ^2.8.3
+
   lottie: ^3.2.0
   provider: ^6.1.2
-  fluttertoast: ^8.2.10
+  fluttertoast: ^8.2.12
   font_awesome_flutter: ^10.8.0
   #  flutter_native_splash: any
-  shared_preferences: ^2.3.4
+  shared_preferences: ^2.5.2
   avatar_glow: ^3.0.1
   url_launcher: ^6.3.1
   carousel_slider: ^5.0.0
   image_picker: ^1.1.2
   intl_phone_field: ^3.2.0
   intl: ^0.19.0
-  mobile_scanner: ^6.0.2
+  mobile_scanner: ^6.0.6
   ticket_widget: ^1.0.2
   readmore: ^3.0.0
   dart_date: ^1.4.0
@@ -48,7 +59,6 @@ dependencies:
   screenshot: ^3.0.0
   email_validator: ^3.0.0
   flutter_islamic_icons: ^1.0.2
-  supabase_flutter: ^2.8.2
   #  horizontal_calendar: any
   geocoding: ^3.0.0
   map_launcher: ^3.5.0
@@ -60,53 +70,55 @@ dependencies:
   timelines: ^0.1.0
   animated_flip_counter: ^0.3.4
   pretty_qr_code: ^3.3.0
-  http: ^1.2.2
+  http: ^1.3.0
   decimal: ^3.0.2
-  openfoodfacts: ^3.18.1
+  openfoodfacts: ^3.19.0
   video_player: ^2.9.2
-  chewie: ^1.8.5
+  chewie: ^1.10.0
   flutter_easyloading: ^3.0.5
   wakelock_plus: ^1.2.10
   faker: ^2.2.0
-  postgres: ^3.4.7
   timeago: ^3.7.0
-  objectbox: ^4.0.3
-  objectbox_flutter_libs: ^4.0.3
-  network_info_plus: ^6.1.2
-  multicast_dns: ^0.3.2+7
+  objectbox: ^4.1.0
+  objectbox_flutter_libs: ^4.1.0
+  network_info_plus: ^6.1.3
+  multicast_dns: ^0.3.2+8
   percent_indicator: ^4.2.4
   icons_plus: ^5.0.0
   feedback: ^3.1.0
-  win32: ^5.9.0
+  win32: ^5.10.1
   msix: ^3.16.8
-  device_info_plus: ^11.2.0
+  device_info_plus: ^11.3.0
   pincode_input_fields: ^1.0.3
-  syncfusion_flutter_barcodes: ^28.1.35
+  syncfusion_flutter_barcodes: ^28.2.5
   excel: ^4.0.6
   country_flags: ^3.2.0
-  google_mobile_ads: ^5.2.0
+  google_mobile_ads: ^5.3.1
   permission_handler: ^11.3.1
-  file_picker: ^8.1.6
-  vibration: ^2.0.1
+  file_picker: ^8.3.5
+  vibration: ^3.1.2
   window_manager: ^0.4.3
   string_extensions: ^0.7.3
   #  fluent_ui: ^4.10.0
   #  firebase_auth: ^5.3.4
   calendar_timeline: ^1.1.3
-  flutter_slidable: ^3.1.2
+  flutter_slidable: ^4.0.0
+  connectivity_plus: ^6.1.3
+  #  media_kit: ^1.1.11 # Primary package.
+  #  media_kit_video: ^1.2.5 # For video rendering.
+  #  media_kit_libs_video: ^1.0.5 # Native video dependencies.
+  #  media_kit_libs_audio: ^1.0.5 # Native audio dependencies.
+  flutter_avif: ^3.0.0
+  youtube_player_flutter: ^9.1.1
 
-#  media_kit: ^1.1.11 # Primary package.
-#  media_kit_video: ^1.2.5 # For video rendering.
-#  media_kit_libs_video: ^1.0.5 # Native video dependencies.
-#  media_kit_libs_audio: ^1.0.5 # Native audio dependencies.
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.14.2
-  objectbox_generator: ^4.0.3
-  build_runner: ^2.4.0
+  flutter_launcher_icons: ^0.14.3
+  objectbox_generator: ^4.1.0
+  build_runner: ^2.4.14
 
 flutter_icons:
   android: true
@@ -164,4 +176,5 @@ flutter:
     - assets/images/icon.png
     - assets/firebase_logo.png
     - assets/google_logo.png
+
 

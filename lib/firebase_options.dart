@@ -41,19 +41,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDxAY36yIKV40uJK2MPo8WhW_xi4DAFN0k',
-    appId: '1:330293988254:web:6decef77298806bf41648f',
+    apiKey: 'AIzaSyCUqIwqieBQxsqzXnWKISJSw52XLbJxWKk',
+    appId: '1:330293988254:web:9d7fdff13400352b41648f',
     messagingSenderId: '330293988254',
     projectId: 'walletdz-d12e0',
     authDomain: 'walletdz-d12e0.firebaseapp.com',
     databaseURL: 'https://walletdz-d12e0-default-rtdb.firebaseio.com',
     storageBucket: 'walletdz-d12e0.appspot.com',
-    measurementId: 'G-4N0BTDFDXS',
+    measurementId: 'G-5H93D9Z5ZH',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBeLnEzq0iSZjfx0R-pgu6cs89Ooyfozq0',
-    appId: '1:330293988254:android:61adcf051c6c384c41648f',
+    appId: '1:330293988254:android:0562d6c8bd50fd4141648f',
     messagingSenderId: '330293988254',
     projectId: 'walletdz-d12e0',
     databaseURL: 'https://walletdz-d12e0-default-rtdb.firebaseio.com',
@@ -62,37 +62,40 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAie3hehD-yr_4tOGx0u94JjZL-i16-ROA',
-    appId: '1:330293988254:ios:fe4a07fa1f52ef2141648f',
+    appId: '1:330293988254:ios:b4dc0ca5e254c5bc41648f',
     messagingSenderId: '330293988254',
     projectId: 'walletdz-d12e0',
     databaseURL: 'https://walletdz-d12e0-default-rtdb.firebaseio.com',
     storageBucket: 'walletdz-d12e0.appspot.com',
-    androidClientId: '330293988254-oipcq87lmch78m131nauh2b6c2fb0875.apps.googleusercontent.com',
-    iosClientId: '330293988254-h6me1one0u8rl1r1o8uam3rco5d7200f.apps.googleusercontent.com',
+    androidClientId:
+        '330293988254-5p93m05gsefgb03j1mrkjrup8ul6nk84.apps.googleusercontent.com',
+    iosClientId:
+        '330293988254-h6me1one0u8rl1r1o8uam3rco5d7200f.apps.googleusercontent.com',
     iosBundleId: 'com.wallet.dz.kenzy',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAie3hehD-yr_4tOGx0u94JjZL-i16-ROA',
-    appId: '1:330293988254:ios:fe4a07fa1f52ef2141648f',
+    appId: '1:330293988254:ios:b4dc0ca5e254c5bc41648f',
     messagingSenderId: '330293988254',
     projectId: 'walletdz-d12e0',
     databaseURL: 'https://walletdz-d12e0-default-rtdb.firebaseio.com',
     storageBucket: 'walletdz-d12e0.appspot.com',
-    androidClientId: '330293988254-oipcq87lmch78m131nauh2b6c2fb0875.apps.googleusercontent.com',
-    iosClientId: '330293988254-h6me1one0u8rl1r1o8uam3rco5d7200f.apps.googleusercontent.com',
+    androidClientId:
+        '330293988254-5p93m05gsefgb03j1mrkjrup8ul6nk84.apps.googleusercontent.com',
+    iosClientId:
+        '330293988254-h6me1one0u8rl1r1o8uam3rco5d7200f.apps.googleusercontent.com',
     iosBundleId: 'com.wallet.dz.kenzy',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyCUqIwqieBQxsqzXnWKISJSw52XLbJxWKk',
-    appId: '1:330293988254:web:707a7629de36672a41648f',
+    appId: '1:330293988254:web:d1670132490207fa41648f',
     messagingSenderId: '330293988254',
     projectId: 'walletdz-d12e0',
     authDomain: 'walletdz-d12e0.firebaseapp.com',
     databaseURL: 'https://walletdz-d12e0-default-rtdb.firebaseio.com',
     storageBucket: 'walletdz-d12e0.appspot.com',
-    measurementId: 'G-RX9ZDZEEEQ',
+    measurementId: 'G-1JCVX0JJCZ',
   );
-
 }

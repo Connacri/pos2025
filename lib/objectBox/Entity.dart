@@ -5,9 +5,11 @@ class User {
   @Id()
   int id;
   String? photo;
+  @Index()
   String username;
   String password;
   String email;
+  @Index()
   String? phone;
   String role;
   DateTime derniereModification;
@@ -48,10 +50,11 @@ class User {
 @Entity()
 class Produit {
   int id;
-  @Unique()
-  @Index() // Indexation du QR pour une recherche rapide
+  @Unique(onConflict: ConflictStrategy.replace)
+  //@Index() // Indexation du QR pour une recherche rapide
   String? qr; // Stocker les QR codes comme une chaîne avec des séparateurs
   String? image;
+  @Index()
   String nom;
   String? description;
   double prixVente;
@@ -165,6 +168,7 @@ class Approvisionnement {
   double quantite;
   bool isSynced;
   double? prixAchat;
+  @Index()
   DateTime? derniereModification;
   DateTime syncedAt;
 
@@ -253,8 +257,11 @@ class Crud {
 class Fournisseur {
   int id;
   @Unique()
+  @Index()
   String? qr;
+  @Index()
   String nom;
+  @Index()
   String? phone;
   String? adresse;
   DateTime derniereModification;
@@ -294,8 +301,11 @@ class Fournisseur {
 @Entity()
 class Client {
   int id;
+  @Index()
   String qr;
+  @Index()
   String nom;
+  @Index()
   String phone;
   String adresse;
   String? description;
@@ -340,7 +350,9 @@ class Document {
   //int id;
   @Id()
   int id = 0;
+  @Index()
   String type; // 'vente', 'achat', etc.
+  @Index()
   String qrReference;
   double? impayer;
   DateTime derniereModification;
@@ -461,6 +473,7 @@ enum DocumentEtat {
 class DeletedProduct {
   @Id()
   int id = 0;
+  @Index()
   String name;
   String description;
   double price;
@@ -495,4 +508,20 @@ class DeletedProduct {
           : DateTime.now(),
     );
   }
+}
+
+@Entity()
+class Annonces {
+  int id = 0; // Clé primaire automatique
+  String titre = ''; // Titre de l'annonce
+  String prix = ''; // Prix de l'annonce
+  String lien = ''; // Lien vers l'annonce
+  String categorie = ''; // Catégorie de l'annonce
+
+  Annonces({
+    required this.titre,
+    required this.prix,
+    required this.lien,
+    required this.categorie,
+  });
 }

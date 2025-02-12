@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
+  flutter_avif_linux
   gtk
   objectbox_flutter_libs
   screen_retriever_linux

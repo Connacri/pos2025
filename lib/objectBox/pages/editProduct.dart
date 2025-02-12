@@ -10,7 +10,7 @@ import 'package:dart_date/dart_date.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as su;
 import 'package:path/path.dart' as path;
 import '../Entity.dart';
 import '../MyProviders.dart';
@@ -1835,7 +1835,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   Future<String> uploadImageToSupabase(File image, String? oldImageUrl) async {
     final String bucket = 'products';
-    final supabase = Supabase.instance.client;
+    final supabase = su.Supabase.instance.client;
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final fileName =
         '${_prixVenteController.text}${_stockController.text}$timestamp${path.extension(image.path)}';

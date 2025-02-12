@@ -25,14 +25,27 @@ class _WinMobileState extends State<WinMobile> {
         Platform.isMacOS ||
         Platform.isLinux ||
         Platform.isFuchsia) {
-      final Size currentSize = await windowManager.getSize();
-      setState(() {
-        // Si la taille est proche de celle du mobile
-        isPhoneSize =
-            (currentSize.width < 500); // On utilise une valeur approximative
-        iconSign =
-            isPhoneSize ? FontAwesomeIcons.desktop : FontAwesomeIcons.mobile;
-      });
+      try {
+        // Attempt to get the window size
+        final Size? currentSize = await windowManager.getSize();
+
+        // Check if currentSize is not null before proceeding
+        if (currentSize != null) {
+          setState(() {
+            // Determine if the size is similar to a phone
+            isPhoneSize = (currentSize.width < 600);
+            iconSign = isPhoneSize
+                ? FontAwesomeIcons.desktop
+                : FontAwesomeIcons.mobile;
+          });
+        } else {
+          // Handle the case where getSize() returns null
+          print("Window size is null. Unable to determine screen dimensions.");
+        }
+      } catch (e) {
+        // Catch any exceptions and log them
+        print("Error while checking window size: $e");
+      }
     }
   }
 
