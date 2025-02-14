@@ -10,7 +10,7 @@ import 'package:dart_date/dart_date.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as su;
 import 'package:path/path.dart' as path;
 import '../Entity.dart';
 import '../MyProviders.dart';
@@ -44,11 +44,10 @@ class ResponsiveLayout extends StatefulWidget {
   final Produit produit;
   final Fournisseur? specifiquefournisseur;
 
-  ResponsiveLayout(
-      {Key? key,
-      required this.produit,
-      this.qrCode,
-      this.specifiquefournisseur})
+  ResponsiveLayout({Key? key,
+    required this.produit,
+    this.qrCode,
+    this.specifiquefournisseur})
       : super(key: key);
   final String? qrCode;
 
@@ -70,7 +69,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   final _alertPeremptionController = TextEditingController(text: '2');
   final _qtyPartielController = TextEditingController(text: '1');
   final TextEditingController _pricePartielVenteController =
-      TextEditingController();
+  TextEditingController();
   final FocusNode _serialFocusNode = FocusNode();
   final FocusNode _focusNodeNom = FocusNode();
   final FocusNode _focusNodePV = FocusNode();
@@ -314,9 +313,12 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   @override
   Widget build(BuildContext context) {
     final produitProvider =
-        Provider.of<CommerceProvider>(context, listen: false);
+    Provider.of<CommerceProvider>(context, listen: false);
 
-    final iskeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
+    final iskeyboard = MediaQuery
+        .of(context)
+        .viewInsets
+        .bottom != 0;
     // Vérifiez que produit.qr n'est pas vide ou null
     // List<String> _qrCodesTemp = qrCodesString.isNotEmpty
     //     ? qrCodesString.split(',') // Sépare les QR codes par la virgule
@@ -435,7 +437,10 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   }
 
   Padding _buildColumn() {
-    var largeur = MediaQuery.of(context).size.width;
+    var largeur = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     final String fallbackImage =
         'https://source.unsplash.com/random/1920x1080/?wallpaper,landscape';
@@ -514,9 +519,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                 // ),
                 suffixIcon: (Platform.isIOS || Platform.isAndroid)
                     ? IconButton(
-                        icon: Icon(Icons.qr_code_scanner),
-                        onPressed: _scanQRCode,
-                      )
+                  icon: Icon(Icons.qr_code_scanner),
+                  onPressed: _scanQRCode,
+                )
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
@@ -534,239 +539,192 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
           _qrCodesTemp.isEmpty
               ? Container()
               : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    spacing: 8.0, // Espacement horizontal entre les Chips
-                    runSpacing: 7.0, // Espacement vertical entre les Chips
-                    children: [
-                      if (_qrCodesTemp.isNotEmpty)
-                        Chip(
-                          padding: EdgeInsets.zero,
-                          backgroundColor:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.blueAccent.withOpacity(
-                                      0.2) // Couleur pour le thème sombre
-                                  : Colors.blueAccent.withOpacity(
-                                      0.6), // Couleur pour le thème clair
-                          visualDensity: VisualDensity(vertical: -1),
-                          label: Text(
-                            '${_qrCodesTemp.length}',
-                            style: TextStyle(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors
-                                      .white // Couleur du texte pour le thème sombre
-                                  : Colors
-                                      .black, // Couleur du texte pour le thème clair
-                            ),
-                          ),
-                        ),
-                      ..._qrCodesTemp.map(
-                        (code) => Chip(
-                          padding: EdgeInsets.zero,
-                          backgroundColor:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.blueAccent.withOpacity(
-                                      0.2) // Couleur pour le thème sombre
-                                  : Colors.blueAccent.withOpacity(0.6),
-                          // Couleur pour le thème clair
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(20.0), // Coins arrondis
-                          ),
-                          avatar: Align(
-                            alignment: Alignment
-                                .center, // Centre l'avatar verticalement
-                            child: CircularFlagDetector(
-                              barcode: code,
-                              size: 25, // Adjust the size as needed
-                            ),
-                          ),
-                          visualDensity: VisualDensity(vertical: -1),
-                          // Ajustement vertical pour recentrer le contenu
-                          label: Text(
-                            code,
-                            style: TextStyle(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors
-                                      .white // Couleur du texte pour le thème sombre
-                                  : Colors
-                                      .black, // Couleur du texte pour le thème clair
-                            ),
-                          ),
-                          // Affiche le QR code dans le Chip
-                          deleteIcon:
-                              Icon(Icons.delete, size: 15, color: Colors.red),
-
-                          onDeleted: () {
-                            setState(() {
-                              _qrCodesTemp.remove(
-                                  code); // Supprime le QR code sélectionné
-                              print(_qrCodesTemp);
-                            });
-                          },
-                        ),
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              spacing: 8.0, // Espacement horizontal entre les Chips
+              runSpacing: 7.0, // Espacement vertical entre les Chips
+              children: [
+                if (_qrCodesTemp.isNotEmpty)
+                  Chip(
+                    padding: EdgeInsets.zero,
+                    backgroundColor:
+                    Theme
+                        .of(context)
+                        .brightness == Brightness.dark
+                        ? Colors.blueAccent.withOpacity(
+                        0.2) // Couleur pour le thème sombre
+                        : Colors.blueAccent.withOpacity(
+                        0.6), // Couleur pour le thème clair
+                    visualDensity: VisualDensity(vertical: -1),
+                    label: Text(
+                      '${_qrCodesTemp.length}',
+                      style: TextStyle(
+                        color: Theme
+                            .of(context)
+                            .brightness ==
+                            Brightness.dark
+                            ? Colors
+                            .white // Couleur du texte pour le thème sombre
+                            : Colors
+                            .black, // Couleur du texte pour le thème clair
                       ),
-                    ],
+                    ),
                   ),
+                ..._qrCodesTemp.map(
+                      (code) =>
+                      Chip(
+                        padding: EdgeInsets.zero,
+                        backgroundColor:
+                        Theme
+                            .of(context)
+                            .brightness == Brightness.dark
+                            ? Colors.blueAccent.withOpacity(
+                            0.2) // Couleur pour le thème sombre
+                            : Colors.blueAccent.withOpacity(0.6),
+                        // Couleur pour le thème clair
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(20.0), // Coins arrondis
+                        ),
+                        avatar: Align(
+                          alignment: Alignment
+                              .center, // Centre l'avatar verticalement
+                          child: CircularFlagDetector(
+                            barcode: code,
+                            size: 25, // Adjust the size as needed
+                          ),
+                        ),
+                        visualDensity: VisualDensity(vertical: -1),
+                        // Ajustement vertical pour recentrer le contenu
+                        label: Text(
+                          code,
+                          style: TextStyle(
+                            color: Theme
+                                .of(context)
+                                .brightness ==
+                                Brightness.dark
+                                ? Colors
+                                .white // Couleur du texte pour le thème sombre
+                                : Colors
+                                .black, // Couleur du texte pour le thème clair
+                          ),
+                        ),
+                        // Affiche le QR code dans le Chip
+                        deleteIcon:
+                        Icon(Icons.delete, size: 15, color: Colors.red),
+
+                        onDeleted: () {
+                          setState(() {
+                            _qrCodesTemp.remove(
+                                code); // Supprime le QR code sélectionné
+                            print(_qrCodesTemp);
+                          });
+                        },
+                      ),
                 ),
+              ],
+            ),
+          ),
           // wrap qrcode
           _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
               ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: buildColumnPicSuppliers(largeur, context),
-                )
+            padding: const EdgeInsets.all(8.0),
+            child: buildColumnPicSuppliers(largeur, context),
+          )
               : Container(),
           // photo
           _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
               ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    enabled: !_isLoadingSauv,
-                    controller: _nomController,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    // Action "Suivant"
-                    onFieldSubmitted: (_) {
-                      _focusNodePV.requestFocus(); // Passe au champ 2
-                    },
-                    // onChanged: (value) {
-                    //   // Force la validation à chaque changement
-                    //   _formKey.currentState?.validate();
-                    // },
-                    decoration: InputDecoration(
-                      //  fillColor: _isFirstFieldFilled ? Colors.green.shade100 : null,
-                      suffixIcon: !_showDescription
-                          ? Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _showDescription = true;
-                                    });
-                                  },
-                                  icon: Icon(Icons.arrow_downward_rounded)),
-                            )
-                          : null,
-                      prefixIcon: _isFirstFieldRempli
-                          ? IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                _clearAllFields();
-                              },
-                              tooltip: 'Effacer tous les champs',
-                            )
-                          : null,
-                      labelText: 'Nom Du Produit',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none, // Supprime le contour
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide
-                            .none, // Supprime le contour en état normal
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide
-                            .none, // Supprime le contour en état focus
-                      ),
-                      filled: true,
-                      contentPadding: EdgeInsets.all(15),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer un nom du Produit';
-                      }
-                      return null;
-                    },
-                  ),
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              enabled: !_isLoadingSauv,
+              controller: _nomController,
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              // Action "Suivant"
+              onFieldSubmitted: (_) {
+                _focusNodePV.requestFocus(); // Passe au champ 2
+              },
+              // onChanged: (value) {
+              //   // Force la validation à chaque changement
+              //   _formKey.currentState?.validate();
+              // },
+              decoration: InputDecoration(
+                //  fillColor: _isFirstFieldFilled ? Colors.green.shade100 : null,
+                suffixIcon: !_showDescription
+                    ? Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _showDescription = true;
+                        });
+                      },
+                      icon: Icon(Icons.arrow_downward_rounded)),
                 )
+                    : null,
+                prefixIcon: _isFirstFieldRempli
+                    ? IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _clearAllFields();
+                  },
+                  tooltip: 'Effacer tous les champs',
+                )
+                    : null,
+                labelText: 'Nom Du Produit',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none, // Supprime le contour
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide
+                      .none, // Supprime le contour en état normal
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide
+                      .none, // Supprime le contour en état focus
+                ),
+                filled: true,
+                contentPadding: EdgeInsets.all(15),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez entrer un nom du Produit';
+                }
+                return null;
+              },
+            ),
+          )
               : Container(),
           // nom
           Container(
             child: !_showDescription
                 ? Container()
                 : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        TextFormField(
-                          controller: _descriptionController,
-                          enabled: !_isLoadingSauv,
-                          onFieldSubmitted: (_) {
-                            _focusNodePV.requestFocus(); // Passe au champ 2
-                          },
-                          maxLines: 5,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          // Action "Suivant"
-                          decoration: InputDecoration(
-                            hintText: 'Déscription',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide:
-                                  BorderSide.none, // Supprime le contour
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide
-                                  .none, // Supprime le contour en état normal
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide
-                                  .none, // Supprime le contour en état focus
-                            ),
-                            filled: true,
-                            contentPadding: EdgeInsets.all(15),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.arrow_upward,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _showDescription = false;
-                              });
-                            },
-                            tooltip: 'Effacer tous les champs',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
-          // description
-          _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
+              padding: const EdgeInsets.all(8.0),
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  TextFormField(
+                    controller: _descriptionController,
                     enabled: !_isLoadingSauv,
-
-                    controller: _prixVenteController,
-                    textAlign: TextAlign.center,
+                    onFieldSubmitted: (_) {
+                      _focusNodePV.requestFocus(); // Passe au champ 2
+                    },
+                    maxLines: 5,
+                    keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
                     // Action "Suivant"
-                    onFieldSubmitted: (_) {
-                      _focusNodeStock.requestFocus(); // Passe au champ 2
-                    },
-                    // onChanged: (value) {
-                    //   // Force la validation à chaque changement
-                    //   _formKey.currentState?.validate();
-                    // },
                     decoration: InputDecoration(
-                      labelText: 'Prix de vente',
+                      hintText: 'Déscription',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none, // Supprime le contour
+                        borderSide:
+                        BorderSide.none, // Supprime le contour
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
@@ -778,281 +736,337 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                         borderSide: BorderSide
                             .none, // Supprime le contour en état focus
                       ),
-                      //border: InputBorder.none,
                       filled: true,
                       contentPadding: EdgeInsets.all(15),
                     ),
-                    // keyboardType: TextInputType.number,
-                    // validator: (value) {
-                    //   if (value == null || value.isEmpty) {
-                    //     return 'Veuillez entrer le prix de vente';
-                    //   }
-                    //   return null;
-                    // },
-                    keyboardType: TextInputType.numberWithOptions(
-                        decimal: true, signed: true),
-
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                    // onChanged: (value) {
-                    //   if (value.isNotEmpty) {
-                    //     double? parsed = double.tryParse(value);
-                    //     if (parsed != null) {
-                    //       _prixVenteController.text = parsed.toStringAsFixed(2);
-                    //       _prixVenteController.selection =
-                    //           TextSelection.fromPosition(
-                    //         TextPosition(
-                    //             offset: _prixVenteController.text.length),
-                    //       );
-                    //     }
-                    //   }
-                    // },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer le prix d\'achat';
-                      }
-                      // if (double.tryParse(value) == null) {
-                      //   return 'Veuillez entrer un prix valide';
-                      // }
-                      return null;
-                    },
                   ),
-                )
-              // prix de vente
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showDescription = false;
+                        });
+                      },
+                      tooltip: 'Effacer tous les champs',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // description
+          _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
+              ? Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              enabled: !_isLoadingSauv,
+
+              controller: _prixVenteController,
+              textAlign: TextAlign.center,
+              textInputAction: TextInputAction.next,
+              // Action "Suivant"
+              onFieldSubmitted: (_) {
+                _focusNodeStock.requestFocus(); // Passe au champ 2
+              },
+              // onChanged: (value) {
+              //   // Force la validation à chaque changement
+              //   _formKey.currentState?.validate();
+              // },
+              decoration: InputDecoration(
+                labelText: 'Prix de vente',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none, // Supprime le contour
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide
+                      .none, // Supprime le contour en état normal
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide
+                      .none, // Supprime le contour en état focus
+                ),
+                //border: InputBorder.none,
+                filled: true,
+                contentPadding: EdgeInsets.all(15),
+              ),
+              // keyboardType: TextInputType.number,
+              // validator: (value) {
+              //   if (value == null || value.isEmpty) {
+              //     return 'Veuillez entrer le prix de vente';
+              //   }
+              //   return null;
+              // },
+              keyboardType: TextInputType.numberWithOptions(
+                  decimal: true, signed: true),
+
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'^\d+\.?\d{0,2}')),
+              ],
+              // onChanged: (value) {
+              //   if (value.isNotEmpty) {
+              //     double? parsed = double.tryParse(value);
+              //     if (parsed != null) {
+              //       _prixVenteController.text = parsed.toStringAsFixed(2);
+              //       _prixVenteController.selection =
+              //           TextSelection.fromPosition(
+              //         TextPosition(
+              //             offset: _prixVenteController.text.length),
+              //       );
+              //     }
+              //   }
+              // },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez entrer le prix d\'achat';
+                }
+                // if (double.tryParse(value) == null) {
+                //   return 'Veuillez entrer un prix valide';
+                // }
+                return null;
+              },
+            ),
+          )
+          // prix de vente
               : Container(),
 
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: !_showDetail
                 ? _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
-                    ? TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _showDetail = true;
-                          });
-                        },
-                        icon: Icon(Icons.keyboard_arrow_down),
-                        label: Text('Detail'),
-                      )
-                    : Container()
+                ? TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _showDetail = true;
+                });
+              },
+              icon: Icon(Icons.keyboard_arrow_down),
+              label: Text('Detail'),
+            )
+                : Container()
                 : Container(
-                    padding: EdgeInsets.all(
-                        8.0), // Espacement à l'intérieur du cadre
-                    decoration: BoxDecoration(
-                      //      color: Colors.grey, // Couleur de fond
-                      borderRadius:
-                          BorderRadius.circular(8.0), // Bords arrondis
-                      border: Border.all(
-                        color: Colors.grey, // Couleur de la bordure
-                        width: 1.0, // Épaisseur de la bordure
-                      ),
-                    ),
-                    child: Column(
+              padding: EdgeInsets.all(
+                  8.0), // Espacement à l'intérieur du cadre
+              decoration: BoxDecoration(
+                //      color: Colors.grey, // Couleur de fond
+                borderRadius:
+                BorderRadius.circular(8.0), // Bords arrondis
+                border: Border.all(
+                  color: Colors.grey, // Couleur de la bordure
+                  width: 1.0, // Épaisseur de la bordure
+                ),
+              ),
+              child: Column(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _showDetail = false;
+                      });
+                    },
+                    icon: Icon(Icons.keyboard_arrow_up),
+                  ),
+                  Container(
+                    width: largeur,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _showDetail = false;
-                            });
-                          },
-                          icon: Icon(Icons.keyboard_arrow_up),
-                        ),
-                        Container(
-                          width: largeur,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    enabled: !_isLoadingSauv,
-                                    onFieldSubmitted: (_) {
-                                      _focusNodePV
-                                          .requestFocus(); // Passe au champ 2
-                                    },
-                                    controller: _qtyPartielController,
-                                    textAlign: TextAlign.center,
-                                    textInputAction: TextInputAction.next,
-                                    // Action "Suivant"
-                                    // onFieldSubmitted: (_) {
-                                    //   _focusNodeStock
-                                    //       .requestFocus(); // Passe au champ 2
-                                    // },
-                                    // onChanged: (value) {
-                                    //   // Force la validation à chaque changement
-                                    //   _formKey.currentState?.validate();
-                                    // },
-                                    decoration: InputDecoration(
-                                      labelText: 'Piéce dans ce Pack',
-                                      suffixIcon: TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _qtyPartielController.text = '1';
-                                            _resultatPrixPartiel = (double
-                                                        .parse(
-                                                            _prixVenteController
-                                                                .text) /
-                                                    double.parse(
-                                                        _qtyPartielController
-                                                            .text))
-                                                .toStringAsFixed(2);
-                                          });
-                                        },
-                                        child: Text(
-                                          'Reset',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour en état normal
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour en état focus
-                                      ),
-                                      //border: InputBorder.none,
-                                      filled: true,
-                                      contentPadding: EdgeInsets.all(15),
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                    // validator: (value) {
-                                    //   if (value == null || value.isEmpty) {
-                                    //     return 'Veuillez entrer le prix de vente';
-                                    //   }
-                                    //   return null;
-                                    // },
-                                    keyboardType:
-                                        TextInputType.numberWithOptions(
-                                            decimal: true, signed: true),
-
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d{0,2}')),
-                                    ],
-                                    // onChanged: (value) {
-                                    //   if (value.isNotEmpty) {
-                                    //     double? parsed = double.tryParse(value);
-                                    //     if (parsed != null) {
-                                    //       _prixVenteController.text = parsed.toStringAsFixed(2);
-                                    //       _prixVenteController.selection =
-                                    //           TextSelection.fromPosition(
-                                    //         TextPosition(
-                                    //             offset: _prixVenteController.text.length),
-                                    //       );
-                                    //     }
-                                    //   }
-                                    // },
-                                    // onTap: () {
-                                    //   if (_isFirstTap) {
-                                    //     _qtyPartielController
-                                    //         .clear(); // Vider la valeur existante
-                                    //     setState(() {
-                                    //       _isFirstTap =
-                                    //           false; // Ne pas effacer les prochains clics
-                                    //     });
-                                    //   }
-                                    // },
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Veuillez entrer combien de piéce dans ce pack';
-                                      }
-                                      // if (double.tryParse(value) == null) {
-                                      //   return 'Veuillez entrer un prix valide';
-                                      // }
-                                      return null;
-                                    },
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              enabled: !_isLoadingSauv,
+                              onFieldSubmitted: (_) {
+                                _focusNodePV
+                                    .requestFocus(); // Passe au champ 2
+                              },
+                              controller: _qtyPartielController,
+                              textAlign: TextAlign.center,
+                              textInputAction: TextInputAction.next,
+                              // Action "Suivant"
+                              // onFieldSubmitted: (_) {
+                              //   _focusNodeStock
+                              //       .requestFocus(); // Passe au champ 2
+                              // },
+                              // onChanged: (value) {
+                              //   // Force la validation à chaque changement
+                              //   _formKey.currentState?.validate();
+                              // },
+                              decoration: InputDecoration(
+                                labelText: 'Piéce dans ce Pack',
+                                suffixIcon: TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _qtyPartielController.text = '1';
+                                      _resultatPrixPartiel = (double
+                                          .parse(
+                                          _prixVenteController
+                                              .text) /
+                                          double.parse(
+                                              _qtyPartielController
+                                                  .text))
+                                          .toStringAsFixed(2);
+                                    });
+                                  },
+                                  child: Text(
+                                    'Reset',
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ),
-                              ), // prix de vente
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: TextFormField(
-                                    enabled: !_isLoadingSauv,
-                                    onFieldSubmitted: (_) {
-                                      _focusNodePV
-                                          .requestFocus(); // Passe au champ 2
-                                    },
-                                    controller: _pricePartielVenteController,
-                                    textAlign: TextAlign.center,
-                                    decoration: InputDecoration(
-                                      labelText:
-                                          'Prix detail : $_resultatPrixPartiel DZD',
-                                      // suffixIcon: Padding(
-                                      //   padding: const EdgeInsets.all(4.0),
-                                      //   child: IconButton(
-                                      //       onPressed: _showAddQuantityDialog,
-                                      //       icon: Icon(Icons.add)),
-                                      // ),
-
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour en état normal
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour en état focus
-                                      ),
-                                      //border: InputBorder.none,
-                                      filled: true,
-                                      contentPadding: EdgeInsets.all(15),
-                                    ),
-                                    keyboardType:
-                                        TextInputType.numberWithOptions(
-                                            decimal: true, signed: true),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d{0,2}')),
-                                    ],
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Veuillez entrer le prix de detail';
-                                      }
-                                      return null;
-                                    },
-                                  ),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état normal
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état focus
+                                ),
+                                //border: InputBorder.none,
+                                filled: true,
+                                contentPadding: EdgeInsets.all(15),
                               ),
-                              // stock alert
-                            ],
+                              // keyboardType: TextInputType.number,
+                              // validator: (value) {
+                              //   if (value == null || value.isEmpty) {
+                              //     return 'Veuillez entrer le prix de vente';
+                              //   }
+                              //   return null;
+                              // },
+                              keyboardType:
+                              TextInputType.numberWithOptions(
+                                  decimal: true, signed: true),
+
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                              // onChanged: (value) {
+                              //   if (value.isNotEmpty) {
+                              //     double? parsed = double.tryParse(value);
+                              //     if (parsed != null) {
+                              //       _prixVenteController.text = parsed.toStringAsFixed(2);
+                              //       _prixVenteController.selection =
+                              //           TextSelection.fromPosition(
+                              //         TextPosition(
+                              //             offset: _prixVenteController.text.length),
+                              //       );
+                              //     }
+                              //   }
+                              // },
+                              // onTap: () {
+                              //   if (_isFirstTap) {
+                              //     _qtyPartielController
+                              //         .clear(); // Vider la valeur existante
+                              //     setState(() {
+                              //       _isFirstTap =
+                              //           false; // Ne pas effacer les prochains clics
+                              //     });
+                              //   }
+                              // },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez entrer combien de piéce dans ce pack';
+                                }
+                                // if (double.tryParse(value) == null) {
+                                //   return 'Veuillez entrer un prix valide';
+                                // }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ), // prix de vente
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: TextFormField(
+                              enabled: !_isLoadingSauv,
+                              onFieldSubmitted: (_) {
+                                _focusNodePV
+                                    .requestFocus(); // Passe au champ 2
+                              },
+                              controller: _pricePartielVenteController,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                labelText:
+                                'Prix detail : $_resultatPrixPartiel DZD',
+                                // suffixIcon: Padding(
+                                //   padding: const EdgeInsets.all(4.0),
+                                //   child: IconButton(
+                                //       onPressed: _showAddQuantityDialog,
+                                //       icon: Icon(Icons.add)),
+                                // ),
+
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état normal
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état focus
+                                ),
+                                //border: InputBorder.none,
+                                filled: true,
+                                contentPadding: EdgeInsets.all(15),
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(
+                                  decimal: true, signed: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez entrer le prix de detail';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            QtyfilledButton(5),
-                            QtyfilledButton(10),
-                            QtyfilledButton(15),
-                            QtyfilledButton(20),
-                          ],
-                        ),
+                        // stock alert
                       ],
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      QtyfilledButton(5),
+                      QtyfilledButton(10),
+                      QtyfilledButton(15),
+                      QtyfilledButton(20),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
           // details
 
@@ -1061,698 +1075,714 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
             padding: const EdgeInsets.all(8.0),
             child: !_showAppro
                 ? _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
-                    ? TextButton.icon(
-                        icon: Icon(Icons.keyboard_arrow_down),
-                        onPressed: () {
-                          setState(() {
-                            _showAppro = true;
-                          });
-                        },
-                        label: Text('Approvisionnement'),
-                      )
-                    : Container()
+                ? TextButton.icon(
+              icon: Icon(Icons.keyboard_arrow_down),
+              onPressed: () {
+                setState(() {
+                  _showAppro = true;
+                });
+              },
+              label: Text('Approvisionnement'),
+            )
+                : Container()
                 : Container(
-                    padding: EdgeInsets.all(
-                        8.0), // Espacement à l'intérieur du cadre
-                    decoration: BoxDecoration(
-                      //      color: Colors.grey, // Couleur de fond
-                      borderRadius:
-                          BorderRadius.circular(8.0), // Bords arrondis
-                      border: Border.all(
-                        color: Colors.grey, // Couleur de la bordure
-                        width: 1.0, // Épaisseur de la bordure
-                      ),
+              padding: EdgeInsets.all(
+                  8.0), // Espacement à l'intérieur du cadre
+              decoration: BoxDecoration(
+                //      color: Colors.grey, // Couleur de fond
+                borderRadius:
+                BorderRadius.circular(8.0), // Bords arrondis
+                border: Border.all(
+                  color: Colors.grey, // Couleur de la bordure
+                  width: 1.0, // Épaisseur de la bordure
+                ),
+              ),
+              child: Form(
+                key: _formKeyApp,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_up),
+                      onPressed: () {
+                        setState(() {
+                          _showAppro = false;
+                        });
+                      },
                     ),
-                    child: Form(
-                      key: _formKeyApp,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.keyboard_arrow_up),
-                            onPressed: () {
-                              setState(() {
-                                _showAppro = false;
-                              });
-                            },
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 7,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    enabled: !_isLoadingSauv,
-                                    controller: _prixAchatController,
-                                    textAlign: TextAlign.center,
-                                    onFieldSubmitted: (_) {
-                                      _focusNodePV
-                                          .requestFocus(); // Passe au champ 2
-                                    },
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              enabled: !_isLoadingSauv,
+                              controller: _prixAchatController,
+                              textAlign: TextAlign.center,
+                              onFieldSubmitted: (_) {
+                                _focusNodePV
+                                    .requestFocus(); // Passe au champ 2
+                              },
 
-                                    decoration: InputDecoration(
-                                      labelText: 'Prix d\'achat',
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour en état normal
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: BorderSide
-                                            .none, // Supprime le contour en état focus
-                                      ),
-                                      filled: true,
-                                      contentPadding: EdgeInsets.all(15),
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                    //  validator: (value) {
-                                    //    if (value == null || value.isEmpty) {
-                                    //      return 'Veuillez entrer le prix d\'achat';
-                                    //    }
-                                    //    return null;
-                                    //  },
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _isButtonSaveApproPrixAchatEnabled =
-                                            value.isNotEmpty;
-                                      });
-                                    },
-                                    keyboardType:
-                                        TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d{0,2}')),
-                                    ],
-                                    // onChanged: (value) {
-                                    //   if (value.isNotEmpty) {
-                                    //     double? parsed = double.tryParse(value);
-                                    //     if (parsed != null) {
-                                    //       _prixAchatController.text = parsed.toStringAsFixed(2);
-                                    //       _prixAchatController.selection =
-                                    //           TextSelection.fromPosition(
-                                    //         TextPosition(
-                                    //             offset: _prixAchatController.text.length),
-                                    //       );
-                                    //     }
-                                    //   }
-                                    // },
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Veuillez entrer le prix d\'achat';
-                                      }
-                                      // if (double.tryParse(value) == null) {
-                                      //   return 'Veuillez entrer un prix valide';
-                                      // }
-                                      // return null;
-                                    },
-                                  ),
+                              decoration: InputDecoration(
+                                labelText: 'Prix d\'achat',
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour
                                 ),
-                              ), //prix d'achat
-                              !_showAppro
-                                  ? Container()
-                                  : Expanded(
-                                      flex: 5,
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8),
-                                        child: TextFormField(
-                                          enabled: !_isLoadingSauv,
-                                          controller: _stockController,
-                                          textAlign: TextAlign.center,
-                                          onFieldSubmitted: (_) {
-                                            _focusNodePV
-                                                .requestFocus(); // Passe au champ 2
-                                          },
-                                          decoration: InputDecoration(
-                                            labelText: 'Stock',
-                                            // suffixIcon: Padding(
-                                            //   padding: const EdgeInsets.all(4.0),
-                                            //   child: IconButton(
-                                            //       onPressed: _showAddQuantityDialog,
-                                            //       icon: Icon(Icons.add)),
-                                            // ),
-
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              borderSide: BorderSide
-                                                  .none, // Supprime le contour
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              borderSide: BorderSide
-                                                  .none, // Supprime le contour en état normal
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              borderSide: BorderSide
-                                                  .none, // Supprime le contour en état focus
-                                            ),
-                                            //border: InputBorder.none,
-                                            filled: true,
-                                            contentPadding: EdgeInsets.all(15),
-                                          ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              _isButtonSaveApproStockEnabled =
-                                                  value.isNotEmpty;
-                                            });
-                                          },
-                                          keyboardType:
-                                              TextInputType.numberWithOptions(
-                                                  decimal: true, signed: true),
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp(r'^\d+\.?\d{0,2}')),
-                                          ],
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Veuillez entrer le stock';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors
-                                      .blueAccent.shade100, // Couleur de fond
-                                  borderRadius: BorderRadius.circular(
-                                      6.0), // Bords arrondis
-                                  border: Border.all(
-                                    color: Colors.grey, // Couleur de la bordure
-                                    width: 1.0, // Épaisseur de la bordure
-                                  ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état normal
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Total Qty',
-                                        style: TextStyle(color: Colors.black54),
-                                      ),
-                                      FittedBox(
-                                        child: Text(
-                                          _totalStock.toStringAsFixed(2),
-                                          style:
-                                              TextStyle(color: Colors.black54),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état focus
                                 ),
+                                filled: true,
+                                contentPadding: EdgeInsets.all(15),
                               ),
-                            ],
+                              // keyboardType: TextInputType.number,
+                              //  validator: (value) {
+                              //    if (value == null || value.isEmpty) {
+                              //      return 'Veuillez entrer le prix d\'achat';
+                              //    }
+                              //    return null;
+                              //  },
+                              onChanged: (value) {
+                                setState(() {
+                                  _isButtonSaveApproPrixAchatEnabled =
+                                      value.isNotEmpty;
+                                });
+                              },
+                              keyboardType:
+                              TextInputType.numberWithOptions(
+                                  decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                              // onChanged: (value) {
+                              //   if (value.isNotEmpty) {
+                              //     double? parsed = double.tryParse(value);
+                              //     if (parsed != null) {
+                              //       _prixAchatController.text = parsed.toStringAsFixed(2);
+                              //       _prixAchatController.selection =
+                              //           TextSelection.fromPosition(
+                              //         TextPosition(
+                              //             offset: _prixAchatController.text.length),
+                              //       );
+                              //     }
+                              //   }
+                              // },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez entrer le prix d\'achat';
+                                }
+                                // if (double.tryParse(value) == null) {
+                                //   return 'Veuillez entrer un prix valide';
+                                // }
+                                // return null;
+                              },
+                            ),
                           ),
-                          // stock
-                          // Flexible(
-                          //   flex: 2,
-                          //   child: Padding(
-                          //     padding: const EdgeInsets.all(8.0),
-                          //     child: TextFormField(
-                          //       enabled: !_isLoadingSauv,
-                          //       controller: _datePeremptionController,
-                          //       textAlign: TextAlign.center,
-                          //       onFieldSubmitted: (_) {
-                          //         _focusNodePV
-                          //             .requestFocus(); // Passe au champ 2
-                          //       },
-                          //       keyboardType: TextInputType.text,
-                          //       decoration: InputDecoration(
-                          //         // fillColor: _isFirstFieldFilled
-                          //         //     ? Colors.yellow.shade200
-                          //         //     : null,
-                          //         labelText: 'Date de Péremption',
-                          //         suffixIcon: IconButton(
-                          //           icon: const Icon(Icons.date_range),
-                          //           onPressed: () async {
-                          //             final DateTime? dateTimePerem =
-                          //                 await showDatePicker(
-                          //               context: context,
-                          //               initialDate: selectedDate,
-                          //               firstDate: DateTime(2000),
-                          //               lastDate: DateTime(2200),
-                          //             );
-                          //             if (dateTimePerem != null) {
-                          //               setState(() {
-                          //                 selectedDate = dateTimePerem;
-                          //                 _datePeremptionController.text =
-                          //                     dateTimePerem.format(
-                          //                         'yMMMMd', 'fr_FR');
-                          //               });
-                          //             }
-                          //           },
-                          //         ),
-                          //         border: OutlineInputBorder(
-                          //           borderRadius: BorderRadius.circular(8.0),
-                          //           borderSide:
-                          //               BorderSide.none, // Supprime le contour
-                          //         ),
-                          //         enabledBorder: OutlineInputBorder(
-                          //           borderRadius: BorderRadius.circular(8.0),
-                          //           borderSide: BorderSide
-                          //               .none, // Supprime le contour en état normal
-                          //         ),
-                          //         focusedBorder: OutlineInputBorder(
-                          //           borderRadius: BorderRadius.circular(8.0),
-                          //           borderSide: BorderSide
-                          //               .none, // Supprime le contour en état focus
-                          //         ),
-                          //         filled: true,
-                          //         contentPadding: EdgeInsets.all(15),
-                          //       ),
-                          //       // validator: (value) {
-                          //       //   if (value == null || value.isEmpty) {
-                          //       //     return 'Veuillez entrer un nom du Produit';
-                          //       //   }
-                          //       //   return null;
-                          //       // },
-                          //     ),
-                          //   ),
-                          // ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.date_range),
-                                color: Colors.blue,
-                                onPressed: () async {
-                                  final DateTime? dateTimePerem =
-                                      await showDatePicker(
-                                    context: context,
-                                    initialDate: selectedDate,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2200),
-                                    currentDate: DateTime.now(),
-                                  );
-                                  if (dateTimePerem != null) {
-                                    setState(() {
-                                      selectedDate = dateTimePerem;
-                                      _datePeremptionController.text =
-                                          DateFormat('dd MMMM yyyy', 'fr_FR')
-                                              .format(dateTimePerem);
-                                    });
-                                  }
-                                },
-                              ),
-                              Text(
-                                _datePeremptionController.text.isEmpty
-                                    ? 'Sélectionner une date d\'expiration'
-                                    : _datePeremptionController.text,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: _datePeremptionController.text.isEmpty
-                                      ? Colors.grey
-                                      : Colors.black,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              buildDatePeremptionInfo(),
-                              _datePeremptionController.text.isEmpty
-                                  ? SizedBox.shrink()
-                                  : IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        size: 15,
-                                      ),
-                                      color: Colors.red,
-                                      onPressed: () async {
-                                        //  selectedDate = dateTimePerem;
-                                        setState(() {
-                                          _datePeremptionController.clear();
-                                        });
-                                      },
-                                    ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            width: largeur,
-                            child: Wrap(
-                              spacing: 8.0,
-                              runSpacing: 4.0,
-                              children: [
-                                // Affiche le fournisseur sélectionné
-                                if (_selectedFournisseur !=
-                                    null) // Afficher seulement si un fournisseur est sélectionné
-                                  !_isLoadingSauv
-                                      ? GestureDetector(
-                                          onTap: () async {
-                                            final result =
-                                                await Navigator.of(context)
-                                                    .push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    FournisseurSelectionScreen(
-                                                  selectedFournisseur:
-                                                      _selectedFournisseur,
-                                                  onSelectedFournisseurChanged:
-                                                      _onSelectedFournisseurChanged,
-                                                ),
-                                              ),
-                                            );
-                                            if (result != null) {
-                                              setState(() {
-                                                _selectedFournisseur =
-                                                    result; // Mettre à jour le fournisseur sélectionné
-                                              });
-                                            }
-                                          },
-                                          child: Chip(
-                                            deleteIcon: Icon(
-                                              Icons.delete,
-                                              size: 15,
-                                            ),
-                                            label: Text(
-                                              _selectedFournisseur!.nom,
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                        .chipTheme
-                                                        .labelStyle
-                                                        ?.color ??
-                                                    Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.color,
-                                              ),
-                                            ),
-                                            onDeleted: () {
-                                              setState(() {
-                                                _selectedFournisseur =
-                                                    null; // Réinitialiser la sélection
-                                              });
-                                            },
-                                            backgroundColor: Theme.of(context)
-                                                    .chipTheme
-                                                    .backgroundColor ??
-                                                Theme.of(context)
-                                                    .colorScheme
-                                                    .surface,
-                                            deleteIconColor: Theme.of(context)
-                                                .colorScheme
-                                                .error,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      16), // Bordures rondes
-                                              side: BorderSide(
-                                                color: Theme.of(context)
-                                                    .dividerColor, // Bordure subtile
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Chip(
-                                          label:
-                                              Text(_selectedFournisseur!.nom),
-                                          // Afficher le nom du fournisseur sélectionné
-
-                                          onDeleted: null,
-                                          // backgroundColor: Colors.grey
-                                          //     .shade300, // Optionnel: couleur grisée
-                                        ),
-
-                                // Icône pour ajouter un fournisseur (toujours la dernière)
-                                _selectedFournisseur == null
-                                    ? Row(
-                                        children: [
-                                          IconButton(
-                                            icon: Icon(Icons.factory),
-                                            color: Colors.blue,
-
-                                            onPressed: !_isLoadingSauv
-                                                ? () async {
-                                                    final result =
-                                                        await Navigator.of(
-                                                                context)
-                                                            .push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            FournisseurSelectionScreen(
-                                                          selectedFournisseur:
-                                                              _selectedFournisseur,
-                                                          onSelectedFournisseurChanged:
-                                                              _onSelectedFournisseurChanged,
-                                                        ),
-                                                      ),
-                                                    );
-                                                    if (result != null) {
-                                                      setState(() {
-                                                        _selectedFournisseur =
-                                                            result; // Mettre à jour le fournisseur sélectionné
-                                                      });
-                                                    }
-                                                  }
-                                                : null, // Désactive si la condition est fausse
-                                          ),
-                                          const Text(
-                                            'Selectionné un Fournisseur',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Container(),
-                                // IconButton(
-                                //   icon: Icon(Icons.add),
-                                //   onPressed: () async {
-                                //     final result =
-                                //         await Navigator.of(context).push(
-                                //       MaterialPageRoute(
-                                //         builder: (context) =>
-                                //             FournisseurSelectionScreen(
-                                //           selectedFournisseur:
-                                //               _selectedFournisseur,
-                                //           onSelectedFournisseurChanged:
-                                //               _onSelectedFournisseurChanged,
-                                //         ),
-                                //       ),
-                                //     );
-                                //     if (result != null) {
-                                //       setState(() {
-                                //         _selectedFournisseur =
-                                //             result; // Mettre à jour le fournisseur sélectionné
-                                //       });
-                                //     }
-                                //   },
+                        ), //prix d'achat
+                        !_showAppro
+                            ? Container()
+                            : Expanded(
+                          flex: 5,
+                          child: Padding(
+                            padding:
+                            const EdgeInsets.only(right: 8),
+                            child: TextFormField(
+                              enabled: !_isLoadingSauv,
+                              controller: _stockController,
+                              textAlign: TextAlign.center,
+                              onFieldSubmitted: (_) {
+                                _focusNodePV
+                                    .requestFocus(); // Passe au champ 2
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Stock',
+                                // suffixIcon: Padding(
+                                //   padding: const EdgeInsets.all(4.0),
+                                //   child: IconButton(
+                                //       onPressed: _showAddQuantityDialog,
+                                //       icon: Icon(Icons.add)),
                                 // ),
+
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état normal
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  borderSide: BorderSide
+                                      .none, // Supprime le contour en état focus
+                                ),
+                                //border: InputBorder.none,
+                                filled: true,
+                                contentPadding: EdgeInsets.all(15),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _isButtonSaveApproStockEnabled =
+                                      value.isNotEmpty;
+                                });
+                              },
+                              keyboardType:
+                              TextInputType.numberWithOptions(
+                                  decimal: true, signed: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty) {
+                                  return 'Veuillez entrer le stock';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors
+                                .blueAccent.shade100, // Couleur de fond
+                            borderRadius: BorderRadius.circular(
+                                6.0), // Bords arrondis
+                            border: Border.all(
+                              color: Colors.grey, // Couleur de la bordure
+                              width: 1.0, // Épaisseur de la bordure
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Total Qty',
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                                FittedBox(
+                                  child: Text(
+                                    _totalStock.toStringAsFixed(2),
+                                    style:
+                                    TextStyle(color: Colors.black54),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(8.0),
-                          //   child: ElevatedButton.icon(
-                          //     icon: Icon(_isEditing ? Icons.edit : Icons.send,
-                          //         color:
-                          //             _isEditing ? Colors.blue : Colors.green),
-                          //     onPressed: _isButtonSaveApproEnabled ||
-                          //             _prixAchatController.text.isNotEmpty
-                          //         ? () {
-                          //             if (!_isLoadingSauv) {
-                          //               setState(() {
-                          //                 saveApprovisionnement(); // Exécute la fonction
-                          //                 calculerTotalStock(); // Mettre à jour le total
-                          //               });
-                          //             }
-                          //           }
-                          //         : null,
-                          //     label: Text(_isEditing
-                          //         ? 'Modifier le Stock'
-                          //         : 'Ajouter ce Stock'),
-                          //   ),
-                          // ), //Ajouter ce Stock
-
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: ElevatedButton.icon(
-                              icon: Icon(
-                                _isEditing ? Icons.edit : Icons.send,
-                                color: _isEditing ? Colors.blue : Colors.green,
-                              ),
-                              onPressed: (_isButtonSaveApproStockEnabled &&
-                                          _isButtonSaveApproPrixAchatEnabled) ||
-                                      (_prixAchatController.text.isNotEmpty &&
-                                          _stockController.text
-                                              .isNotEmpty) //|| // Vérifie si le stock est rempli
-                                  // !_isLoadingSauv // Vérifie que le chargement n'est pas en cours
-                                  ? () {
-                                      setState(() {
-                                        saveApprovisionnement(); // Exécute la fonction
-                                        calculerTotalStock(); // Mettre à jour le total
-                                      });
-                                    }
-                                  : null,
-                              // Désactiver le bouton si les conditions ne sont pas remplies
-                              label: Text(
-                                _isEditing
-                                    ? 'Modifier le Stock'
-                                    : 'Ajouter ce Stock',
-                              ),
-                            ),
+                        ),
+                      ],
+                    ),
+                    // stock
+                    // Flexible(
+                    //   flex: 2,
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.all(8.0),
+                    //     child: TextFormField(
+                    //       enabled: !_isLoadingSauv,
+                    //       controller: _datePeremptionController,
+                    //       textAlign: TextAlign.center,
+                    //       onFieldSubmitted: (_) {
+                    //         _focusNodePV
+                    //             .requestFocus(); // Passe au champ 2
+                    //       },
+                    //       keyboardType: TextInputType.text,
+                    //       decoration: InputDecoration(
+                    //         // fillColor: _isFirstFieldFilled
+                    //         //     ? Colors.yellow.shade200
+                    //         //     : null,
+                    //         labelText: 'Date de Péremption',
+                    //         suffixIcon: IconButton(
+                    //           icon: const Icon(Icons.date_range),
+                    //           onPressed: () async {
+                    //             final DateTime? dateTimePerem =
+                    //                 await showDatePicker(
+                    //               context: context,
+                    //               initialDate: selectedDate,
+                    //               firstDate: DateTime(2000),
+                    //               lastDate: DateTime(2200),
+                    //             );
+                    //             if (dateTimePerem != null) {
+                    //               setState(() {
+                    //                 selectedDate = dateTimePerem;
+                    //                 _datePeremptionController.text =
+                    //                     dateTimePerem.format(
+                    //                         'yMMMMd', 'fr_FR');
+                    //               });
+                    //             }
+                    //           },
+                    //         ),
+                    //         border: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide:
+                    //               BorderSide.none, // Supprime le contour
+                    //         ),
+                    //         enabledBorder: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide: BorderSide
+                    //               .none, // Supprime le contour en état normal
+                    //         ),
+                    //         focusedBorder: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide: BorderSide
+                    //               .none, // Supprime le contour en état focus
+                    //         ),
+                    //         filled: true,
+                    //         contentPadding: EdgeInsets.all(15),
+                    //       ),
+                    //       // validator: (value) {
+                    //       //   if (value == null || value.isEmpty) {
+                    //       //     return 'Veuillez entrer un nom du Produit';
+                    //       //   }
+                    //       //   return null;
+                    //       // },
+                    //     ),
+                    //   ),
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.date_range),
+                          color: Colors.blue,
+                          onPressed: () async {
+                            final DateTime? dateTimePerem =
+                            await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate,
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2200),
+                              currentDate: DateTime.now(),
+                            );
+                            if (dateTimePerem != null) {
+                              setState(() {
+                                selectedDate = dateTimePerem;
+                                _datePeremptionController.text =
+                                    DateFormat('dd MMMM yyyy', 'fr_FR')
+                                        .format(dateTimePerem);
+                              });
+                            }
+                          },
+                        ),
+                        Text(
+                          _datePeremptionController.text.isEmpty
+                              ? 'Sélectionner une date d\'expiration'
+                              : _datePeremptionController.text,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: _datePeremptionController.text.isEmpty
+                                ? Colors.grey
+                                : Colors.black,
                           ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        buildDatePeremptionInfo(),
+                        _datePeremptionController.text.isEmpty
+                            ? SizedBox.shrink()
+                            : IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            size: 15,
+                          ),
+                          color: Colors.red,
+                          onPressed: () async {
+                            //  selectedDate = dateTimePerem;
+                            setState(() {
+                              _datePeremptionController.clear();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Container(
+                      width: largeur,
+                      child: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 4.0,
+                        children: [
+                          // Affiche le fournisseur sélectionné
+                          if (_selectedFournisseur !=
+                              null) // Afficher seulement si un fournisseur est sélectionné
+                            !_isLoadingSauv
+                                ? GestureDetector(
+                              onTap: () async {
+                                final result =
+                                await Navigator.of(context)
+                                    .push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        FournisseurSelectionScreen(
+                                          selectedFournisseur:
+                                          _selectedFournisseur,
+                                          onSelectedFournisseurChanged:
+                                          _onSelectedFournisseurChanged,
+                                        ),
+                                  ),
+                                );
+                                if (result != null) {
+                                  setState(() {
+                                    _selectedFournisseur =
+                                        result; // Mettre à jour le fournisseur sélectionné
+                                  });
+                                }
+                              },
+                              child: Chip(
+                                deleteIcon: Icon(
+                                  Icons.delete,
+                                  size: 15,
+                                ),
+                                label: Text(
+                                  _selectedFournisseur!.nom,
+                                  style: TextStyle(
+                                    color: Theme
+                                        .of(context)
+                                        .chipTheme
+                                        .labelStyle
+                                        ?.color ??
+                                        Theme
+                                            .of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.color,
+                                  ),
+                                ),
+                                onDeleted: () {
+                                  setState(() {
+                                    _selectedFournisseur =
+                                    null; // Réinitialiser la sélection
+                                  });
+                                },
+                                backgroundColor: Theme
+                                    .of(context)
+                                    .chipTheme
+                                    .backgroundColor ??
+                                    Theme
+                                        .of(context)
+                                        .colorScheme
+                                        .surface,
+                                deleteIconColor: Theme
+                                    .of(context)
+                                    .colorScheme
+                                    .error,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(
+                                      16), // Bordures rondes
+                                  side: BorderSide(
+                                    color: Theme
+                                        .of(context)
+                                        .dividerColor, // Bordure subtile
+                                  ),
+                                ),
+                              ),
+                            )
+                                : Chip(
+                              label:
+                              Text(_selectedFournisseur!.nom),
+                              // Afficher le nom du fournisseur sélectionné
 
-                          Flexible(
-                            child: Container(
-                              width: largeur,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: _approvisionnementTemporaire
-                                    .length, // Utilisation de la liste temporaire
-                                itemBuilder: (context, index) {
-                                  // Utilisation de la liste inversée pour afficher les derniers en haut
-                                  final approvisionnement =
-                                      _approvisionnementTemporaire
-                                          .reversed // Inversion de la liste
-                                          .toList()[index];
+                              onDeleted: null,
+                              // backgroundColor: Colors.grey
+                              //     .shade300, // Optionnel: couleur grisée
+                            ),
 
-                                  // Récupérer le fournisseur associé à cet approvisionnement
-                                  final fournisseur =
-                                      approvisionnement.fournisseur.target;
+                          // Icône pour ajouter un fournisseur (toujours la dernière)
+                          _selectedFournisseur == null
+                              ? Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.factory),
+                                color: Colors.blue,
 
-                                  return Card(
-                                      child: InkWell(
-                                    onTap: _isLoadingSauv
-                                        ? null
-                                        : () {
-                                            // Démarrer l'édition de cet approvisionnement
-                                            startEditing(approvisionnement);
-                                          },
-                                    borderRadius: BorderRadius.circular(15),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                onPressed: !_isLoadingSauv
+                                    ? () async {
+                                  final result =
+                                  await Navigator.of(
+                                      context)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FournisseurSelectionScreen(
+                                            selectedFournisseur:
+                                            _selectedFournisseur,
+                                            onSelectedFournisseurChanged:
+                                            _onSelectedFournisseurChanged,
+                                          ),
+                                    ),
+                                  );
+                                  if (result != null) {
+                                    setState(() {
+                                      _selectedFournisseur =
+                                          result; // Mettre à jour le fournisseur sélectionné
+                                    });
+                                  }
+                                }
+                                    : null, // Désactive si la condition est fausse
+                              ),
+                              const Text(
+                                'Selectionné un Fournisseur',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          )
+                              : Container(),
+                          // IconButton(
+                          //   icon: Icon(Icons.add),
+                          //   onPressed: () async {
+                          //     final result =
+                          //         await Navigator.of(context).push(
+                          //       MaterialPageRoute(
+                          //         builder: (context) =>
+                          //             FournisseurSelectionScreen(
+                          //           selectedFournisseur:
+                          //               _selectedFournisseur,
+                          //           onSelectedFournisseurChanged:
+                          //               _onSelectedFournisseurChanged,
+                          //         ),
+                          //       ),
+                          //     );
+                          //     if (result != null) {
+                          //       setState(() {
+                          //         _selectedFournisseur =
+                          //             result; // Mettre à jour le fournisseur sélectionné
+                          //       });
+                          //     }
+                          //   },
+                          // ),
+                        ],
+                      ),
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(8.0),
+                    //   child: ElevatedButton.icon(
+                    //     icon: Icon(_isEditing ? Icons.edit : Icons.send,
+                    //         color:
+                    //             _isEditing ? Colors.blue : Colors.green),
+                    //     onPressed: _isButtonSaveApproEnabled ||
+                    //             _prixAchatController.text.isNotEmpty
+                    //         ? () {
+                    //             if (!_isLoadingSauv) {
+                    //               setState(() {
+                    //                 saveApprovisionnement(); // Exécute la fonction
+                    //                 calculerTotalStock(); // Mettre à jour le total
+                    //               });
+                    //             }
+                    //           }
+                    //         : null,
+                    //     label: Text(_isEditing
+                    //         ? 'Modifier le Stock'
+                    //         : 'Ajouter ce Stock'),
+                    //   ),
+                    // ), //Ajouter ce Stock
+
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton.icon(
+                        icon: Icon(
+                          _isEditing ? Icons.edit : Icons.send,
+                          color: _isEditing ? Colors.blue : Colors.green,
+                        ),
+                        onPressed: (_isButtonSaveApproStockEnabled &&
+                            _isButtonSaveApproPrixAchatEnabled) ||
+                            (_prixAchatController.text.isNotEmpty &&
+                                _stockController.text
+                                    .isNotEmpty) //|| // Vérifie si le stock est rempli
+                        // !_isLoadingSauv // Vérifie que le chargement n'est pas en cours
+                            ? () {
+                          setState(() {
+                            saveApprovisionnement(); // Exécute la fonction
+                            calculerTotalStock(); // Mettre à jour le total
+                          });
+                        }
+                            : null,
+                        // Désactiver le bouton si les conditions ne sont pas remplies
+                        label: Text(
+                          _isEditing
+                              ? 'Modifier le Stock'
+                              : 'Ajouter ce Stock',
+                        ),
+                      ),
+                    ),
+
+                    Flexible(
+                      child: Container(
+                        width: largeur,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: _approvisionnementTemporaire
+                              .length, // Utilisation de la liste temporaire
+                          itemBuilder: (context, index) {
+                            // Utilisation de la liste inversée pour afficher les derniers en haut
+                            final approvisionnement =
+                            _approvisionnementTemporaire
+                                .reversed // Inversion de la liste
+                                .toList()[index];
+
+                            // Récupérer le fournisseur associé à cet approvisionnement
+                            final fournisseur =
+                                approvisionnement.fournisseur.target;
+
+                            return Card(
+                                child: InkWell(
+                                  onTap: _isLoadingSauv
+                                      ? null
+                                      : () {
+                                    // Démarrer l'édition de cet approvisionnement
+                                    startEditing(approvisionnement);
+                                  },
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 3,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            '${approvisionnement.quantite
+                                                .toStringAsFixed(
+                                                approvisionnement.quantite
+                                                    .truncateToDouble() ==
+                                                    approvisionnement.quantite
+                                                    ? 0
+                                                    : 2)}',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              color: _isLoadingSauv
+                                                  ? Colors.black87
+                                                  .withOpacity(0.6)
+                                                  : null,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 6,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              fournisseur != null
+                                                  ? fournisseur.nom.trim()
+                                                  : 'Fournisseur Inconnu',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: _isLoadingSauv
+                                                    ? Colors.black87
+                                                    .withOpacity(0.6)
+                                                    : null,
+                                              ),
+                                            ),
+                                            approvisionnement
+                                                .datePeremption !=
+                                                null
+                                                ? Text(
+                                              'Expire le : ${DateFormat(
+                                                  'dd/MM/yyyy').format(
+                                                  approvisionnement
+                                                      .datePeremption!)}',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: _isLoadingSauv
+                                                    ? Colors.black87
+                                                    .withOpacity(
+                                                    0.6)
+                                                    : null,
+                                              ),
+                                            )
+                                                : Container(),
+                                          ],
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8),
                                             child: Text(
-                                              '${approvisionnement.quantite.toStringAsFixed(approvisionnement.quantite.truncateToDouble() == approvisionnement.quantite ? 0 : 2)}',
+                                              '${approvisionnement.prixAchat!
+                                                  .toStringAsFixed(2)}',
                                               style: TextStyle(
                                                 fontSize: 20,
                                                 color: _isLoadingSauv
                                                     ? Colors.black87
-                                                        .withOpacity(0.6)
+                                                    .withOpacity(0.6)
                                                     : null,
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Expanded(
-                                          flex: 6,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                fournisseur != null
-                                                    ? fournisseur.nom.trim()
-                                                    : 'Fournisseur Inconnu',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _isLoadingSauv
-                                                      ? Colors.black87
-                                                          .withOpacity(0.6)
-                                                      : null,
-                                                ),
-                                              ),
-                                              approvisionnement
-                                                          .datePeremption !=
-                                                      null
-                                                  ? Text(
-                                                      'Expire le : ${DateFormat('dd/MM/yyyy').format(approvisionnement.datePeremption!)}',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: _isLoadingSauv
-                                                            ? Colors.black87
-                                                                .withOpacity(
-                                                                    0.6)
-                                                            : null,
-                                                      ),
-                                                    )
-                                                  : Container(),
-                                            ],
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            icon: Icon(
+                                              Icons.delete,
+                                              color: _isLoadingSauv
+                                                  ? Colors.white
+                                                  .withOpacity(0.6)
+                                                  : Colors.red,
+                                              size: 15,
+                                            ),
+                                            onPressed: _isLoadingSauv
+                                                ? null
+                                                : () {
+                                              // Appeler la méthode pour supprimer l'approvisionnement
+                                              setState(() {
+                                                supprimerApprovisionnementTemporaire(
+                                                    approvisionnement);
+                                                stockGlobale -=
+                                                    approvisionnement
+                                                        .quantite;
+                                                calculerTotalStock();
+                                              });
+                                            },
                                           ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8),
-                                              child: Text(
-                                                '${approvisionnement.prixAchat!.toStringAsFixed(2)}',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  color: _isLoadingSauv
-                                                      ? Colors.black87
-                                                          .withOpacity(0.6)
-                                                      : null,
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              icon: Icon(
-                                                Icons.delete,
-                                                color: _isLoadingSauv
-                                                    ? Colors.white
-                                                        .withOpacity(0.6)
-                                                    : Colors.red,
-                                                size: 15,
-                                              ),
-                                              onPressed: _isLoadingSauv
-                                                  ? null
-                                                  : () {
-                                                      // Appeler la méthode pour supprimer l'approvisionnement
-                                                      setState(() {
-                                                        supprimerApprovisionnementTemporaire(
-                                                            approvisionnement);
-                                                        stockGlobale -=
-                                                            approvisionnement
-                                                                .quantite;
-                                                        calculerTotalStock();
-                                                      });
-                                                    },
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ));
-                                },
-                              ),
-                            ),
-                          ),
-                          //Liste des approvisionnements
-                        ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          },
+                        ),
                       ),
                     ),
-                  ),
+                    //Liste des approvisionnements
+                  ],
+                ),
+              ),
+            ),
           ),
           SizedBox(
             height: 50,
@@ -1765,17 +1795,17 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   FilledButton QtyfilledButton(int StringNum) {
     return FilledButton(
       onPressed:
-          _prixVenteController.text == '' || _qtyPartielController.text == ''
-              ? null
-              : () {
-                  setState(() {
-                    _qtyPartielController.text = StringNum.toString();
-                    _resultatPrixPartiel =
-                        (double.parse(_prixVenteController.text) /
-                                double.parse(_qtyPartielController.text))
-                            .toStringAsFixed(2);
-                  });
-                },
+      _prixVenteController.text == '' || _qtyPartielController.text == ''
+          ? null
+          : () {
+        setState(() {
+          _qtyPartielController.text = StringNum.toString();
+          _resultatPrixPartiel =
+              (double.parse(_prixVenteController.text) /
+                  double.parse(_qtyPartielController.text))
+                  .toStringAsFixed(2);
+        });
+      },
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
           CircleBorder(),
@@ -1835,17 +1865,23 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   Future<String> uploadImageToSupabase(File image, String? oldImageUrl) async {
     final String bucket = 'products';
-    final supabase = Supabase.instance.client;
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final supabase = su.Supabase.instance.client;
+    final timestamp = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     final fileName =
-        '${_prixVenteController.text}${_stockController.text}$timestamp${path.extension(image.path)}';
+        '${_prixVenteController.text}${_stockController.text}$timestamp${path
+        .extension(image.path)}';
 
     try {
       await supabase.storage.from(bucket).upload(fileName, image);
 
       final imageUrl = supabase.storage.from(bucket).getPublicUrl(fileName);
       if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
-        final oldFileName = Uri.parse(oldImageUrl).pathSegments.last;
+        final oldFileName = Uri
+            .parse(oldImageUrl)
+            .pathSegments
+            .last;
         await supabase.storage.from(bucket).remove([oldFileName]);
       }
 
@@ -1890,7 +1926,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
       qtyPartiel: double.parse(_qtyPartielController.text),
       pricePartielVente: double.parse(_pricePartielVenteController.text),
       derniereModification: DateTime.now(),
-    )..crud.target = Crud(
+    )
+      ..crud.target = Crud(
         createdBy: 1,
         updatedBy: 1,
         deletedBy: 1,
@@ -1914,11 +1951,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
 // Étape 4 :Combinaison des Étapes
 
-  IconButton buildButton_Edit(
-    BuildContext context,
-    CommerceProvider produitProvider,
-    bool isFinded,
-  ) {
+  IconButton buildButton_Edit(BuildContext context,
+      CommerceProvider produitProvider,
+      bool isFinded,) {
     return IconButton(
       onPressed: () async {
         if (!mounted) return;
@@ -1928,7 +1963,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
         // Vérifier si le produit existe déjà avant d'afficher le ProgressDialog
         final existingProduct =
-            await produitProvider.getProduitByQr(_serialController.text);
+        await produitProvider.getProduitByQr(_serialController.text);
         if (existingProduct != null) {
           print('Produit existant détecté');
           showExistingProductDialog(context, _serialController.text,
@@ -1957,12 +1992,12 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
             ..image = imageUrl
             ..prixVente = double.parse(_prixVenteController.text)
             ..pricePartielVente =
-                double.parse(_pricePartielVenteController.text)
+            double.parse(_pricePartielVenteController.text)
             ..qtyPartiel = double.parse(_qtyPartielController.text)
             ..derniereModification = DateTime.now();
 
           if ( //_prixAchatController.text.isNotEmpty &&
-              _stockController.text.isNotEmpty) {
+          _stockController.text.isNotEmpty) {
             print('debut saveApprovisionnement');
             saveApprovisionnement();
             print('saveApprovisionnement');
@@ -1983,13 +2018,13 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
       },
       icon: _isLoadingSauv
           ? const CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-            )
+        strokeWidth: 2,
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+      )
           : Icon(
-              isFinded ? Icons.edit : Icons.send,
-              color: Colors.blueAccent,
-            ),
+        isFinded ? Icons.edit : Icons.send,
+        color: Colors.blueAccent,
+      ),
     );
   }
 
@@ -2124,13 +2159,19 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   void showExistingProductDialog(BuildContext context, String code,
       Produit produit, CommerceProvider provider) {
     final commerceProvider =
-        Provider.of<CommerceProvider>(context, listen: false);
+    Provider.of<CommerceProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         // Récupérer la largeur et la hauteur de l'écran
-        final screenWidth = MediaQuery.of(context).size.width;
-        final screenHeight = MediaQuery.of(context).size.height;
+        final screenWidth = MediaQuery
+            .of(context)
+            .size
+            .width;
+        final screenHeight = MediaQuery
+            .of(context)
+            .size
+            .height;
         return Builder(builder: (BuildContext builderContext) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
@@ -2139,7 +2180,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
             titlePadding: EdgeInsets.all(0),
             contentPadding: EdgeInsets.all(20),
             insetPadding:
-                EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+            EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
             title: Padding(
               padding: const EdgeInsets.all(0),
               child: Column(
@@ -2147,45 +2188,48 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                   Center(
                     child: produit.image != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: AspectRatio(
-                              aspectRatio: 1, // Conserve un ratio 1:1
-                              child: CachedNetworkImage(
-                                imageUrl: produit.image!,
-                                fit: BoxFit.cover,
-                                // Remplit l'espace sans déformation
-                                width: screenWidth * 0.4,
-                                // 60% de la largeur de l'écran
-                                height: screenHeight * 0.4,
-                                // 60% de la largeur pour garder le ratio
-                                placeholder: (context, url) => Center(
-                                  child:
-                                      CircularProgressIndicator(), // Indicateur de chargement
-                                ),
-                                errorWidget: (context, url, error) => Center(
-                                  child: Lottie.asset(
-                                    'assets/lotties/1 (8).json',
-                                    // Chemin vers ton fichier Lottie
-                                    width: screenWidth *
-                                        0.2, // Ajuste la taille de l'erreur à 30%
-                                    height: screenWidth * 0.2,
-                                  ),
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: AspectRatio(
+                        aspectRatio: 1, // Conserve un ratio 1:1
+                        child: CachedNetworkImage(
+                          imageUrl: produit.image!,
+                          fit: BoxFit.cover,
+                          // Remplit l'espace sans déformation
+                          width: screenWidth * 0.4,
+                          // 60% de la largeur de l'écran
+                          height: screenHeight * 0.4,
+                          // 60% de la largeur pour garder le ratio
+                          placeholder: (context, url) =>
+                              Center(
+                                child:
+                                CircularProgressIndicator(), // Indicateur de chargement
+                              ),
+                          errorWidget: (context, url, error) =>
+                              Center(
+                                child: Lottie.asset(
+                                  'assets/lotties/1 (8).json',
+                                  // Chemin vers ton fichier Lottie
+                                  width: screenWidth *
+                                      0.2, // Ajuste la taille de l'erreur à 30%
+                                  height: screenWidth * 0.2,
                                 ),
                               ),
-                            ),
-                          )
+                        ),
+                      ),
+                    )
                         : Center(
-                            child: Lottie.asset(
-                              'assets/lotties/1 (8).json',
-                              // Chemin vers ton fichier Lottie
-                              width: screenWidth *
-                                  0.2, // Ajuste la taille de l'erreur à 30%
-                              height: screenWidth * 0.2,
-                            ),
-                          ), // Affiche un container vide si pas d'image
+                      child: Lottie.asset(
+                        'assets/lotties/1 (8).json',
+                        // Chemin vers ton fichier Lottie
+                        width: screenWidth *
+                            0.2, // Ajuste la taille de l'erreur à 30%
+                        height: screenWidth * 0.2,
+                      ),
+                    ), // Affiche un container vide si pas d'image
                   ),
                   Text(
-                    'Dernière Modification : ${produit.derniereModification.format('yMMMMd', 'fr_FR')}',
+                    'Dernière Modification : ${produit.derniereModification
+                        .format('yMMMMd', 'fr_FR')}',
                     style: TextStyle(
                       fontSize: 12,
                     ),
@@ -2213,13 +2257,15 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                               .map((e) => e.trim()) // Supprime les espaces
                               .take(3) // Prend les trois premiers éléments
                               .map(
-                                (code) => Chip(
+                                (code) =>
+                                Chip(
                                   padding: EdgeInsets.zero,
-                                  backgroundColor: Theme.of(context)
-                                              .brightness ==
-                                          Brightness.dark
+                                  backgroundColor: Theme
+                                      .of(context)
+                                      .brightness ==
+                                      Brightness.dark
                                       ? Colors.blueAccent.withOpacity(
-                                          0.2) // Couleur pour le thème sombre
+                                      0.2) // Couleur pour le thème sombre
                                       : Colors.blueAccent.withOpacity(0.6),
                                   // Couleur pour le thème clair
                                   shape: RoundedRectangleBorder(
@@ -2240,25 +2286,29 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                   label: Text(
                                     code,
                                     style: TextStyle(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
+                                      color: Theme
+                                          .of(context)
+                                          .brightness ==
+                                          Brightness.dark
                                           ? Colors
-                                              .white // Texte pour le thème sombre
+                                          .white // Texte pour le thème sombre
                                           : Colors
-                                              .black, // Texte pour le thème clair
+                                          .black, // Texte pour le thème clair
                                     ),
                                   ),
                                 ),
-                              ),
+                          ),
 
                           // Affiche une icône indiquant le nombre de Chips restants, si nécessaire
                           if (produit.qr!.split(',').length > 3)
                             Chip(
                               padding: EdgeInsets.zero,
-                              backgroundColor: Theme.of(context).brightness ==
-                                      Brightness.dark
+                              backgroundColor: Theme
+                                  .of(context)
+                                  .brightness ==
+                                  Brightness.dark
                                   ? Colors.grey.withOpacity(
-                                      0.2) // Couleur pour le thème sombre
+                                  0.2) // Couleur pour le thème sombre
                                   : Colors.grey.withOpacity(0.6),
                               // Couleur pour le thème clair
                               shape: RoundedRectangleBorder(
@@ -2268,8 +2318,10 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                               avatar: Icon(
                                 Icons.more_horiz,
                                 // Icône indiquant plus d'éléments
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
+                                color: Theme
+                                    .of(context)
+                                    .brightness ==
+                                    Brightness.dark
                                     ? Colors.white
                                     : Colors.black,
                               ),
@@ -2277,8 +2329,10 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                 "+${produit.qr!.split(',').length - 3}",
                                 // Nombre d'éléments restants
                                 style: TextStyle(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
+                                  color: Theme
+                                      .of(context)
+                                      .brightness ==
+                                      Brightness.dark
                                       ? Colors.white
                                       : Colors.black,
                                 ),
@@ -2294,10 +2348,12 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                           text: TextSpan(
                             text: 'BarCode'.toUpperCase(),
                             style: TextStyle(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
+                              color: Theme
+                                  .of(context)
+                                  .brightness ==
+                                  Brightness.dark
                                   ? Colors
-                                      .white // Couleur du texte pour le thème sombre
+                                  .white // Couleur du texte pour le thème sombre
                                   : Colors.black,
                               // Couleur du texte pour le thème clair
                               fontSize: 20,
@@ -2346,7 +2402,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                         ),
                       ),
                     Text(
-                      'Prix de vente : ${produit.prixVente.toStringAsFixed(2)} DA',
+                      'Prix de vente : ${produit.prixVente.toStringAsFixed(
+                          2)} DA',
                       style: TextStyle(
                         fontSize: 18,
                       ),
@@ -2427,159 +2484,160 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
       child: Center(
         child: _image == null
             ? Stack(
-                alignment: Alignment.center,
-                children: [
-                  _existingImageUrl != null && _existingImageUrl!.isNotEmpty
-                      ? Container(
-                          width: largeur,
-                          height:
-                              Platform.isAndroid || Platform.isIOS ? 150 : 300,
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                _existingImageUrl = '';
-                              });
-                            },
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: CachedNetworkImage(
-                                      imageUrl: _existingImageUrl!,
-                                      fit: BoxFit.cover,
-                                      // Remplir le container
-                                      width: double.infinity,
-                                      // Remplir en largeur
-                                      height: double.infinity,
-                                      // Remplir en hauteur
-                                      placeholder: (context, url) => Center(
-                                        child:
-                                            CircularProgressIndicator(), // Indicateur de chargement
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(), // Widget en cas d'erreur
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.delete,
-                                  size: 15,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      // Container(
-                      //    width: largeur,
-                      //    height:
-                      //        Platform.isAndroid || Platform.isIOS ? 150 : 300,
-                      //    decoration: BoxDecoration(
-                      //      borderRadius:
-                      //          BorderRadius.circular(8.0), // Bords arrondis
-                      //      border: Border.all(
-                      //        color: Colors.grey, // Couleur de la bordure
-                      //        width: 1.0, // Épaisseur de la bordure
-                      //      ),
-                      //    ),
-                      //    child: ClipRRect(
-                      //      borderRadius: BorderRadius.circular(8.0),
-                      //      child: CachedNetworkImage(
-                      //        imageUrl: _existingImageUrl!,
-                      //        fit: BoxFit.cover, // Remplir le container
-                      //        width: double.infinity, // Remplir en largeur
-                      //        height: double.infinity, // Remplir en hauteur
-                      //        placeholder: (context, url) => Center(
-                      //          child:
-                      //              CircularProgressIndicator(), // Indicateur de chargement
-                      //        ),
-                      //        errorWidget: (context, url, error) =>
-                      //            Container(), // Widget en cas d'erreur
-                      //      ),
-                      //    ),
-                      //  )
-                      : IconButton(
-                          onPressed: _pickImage,
-                          icon: Icon(
-                            Icons.add_a_photo,
-                            color: Colors.blue,
-                          ),
-                        ),
-                  // Container(
-                  //         width: largeur,
-                  //         height:
-                  //             Platform.isAndroid || Platform.isIOS ? 150 : 300,
-                  //         decoration: BoxDecoration(
-                  //           borderRadius:
-                  //               BorderRadius.circular(8.0), // Bords arrondis
-                  //           border: Border.all(
-                  //             color: Colors.grey, // Couleur de la bordure
-                  //             width: 1.0, // Épaisseur de la bordure
-                  //           ),
-                  //         ),
-                  //         child: IconButton(
-                  //           onPressed: _pickImage,
-                  //           icon: Icon(
-                  //             Icons.add_a_photo,
-                  //             color: Colors.blue,
-                  //           ),
-                  //         ),
-                  //       ),
-                  _isLoadingSauv
-                      ? _existingImageUrl != null &&
-                              _existingImageUrl!.isNotEmpty
-                          ? IconButton(
-                              onPressed: () {
-                                _clearAllFields2();
-                              },
-                              icon: Icon(
-                                Icons.delete,
-                                size: 15,
-                                color: Colors.red,
-                              ))
-                          : IconButton(
-                              onPressed: _pickImage,
-                              icon: Icon(
-                                Icons.add_a_photo,
-                                color: Colors.blue,
-                              ),
-                            )
-                      : Container(),
-                ],
-              )
-            : Container(
-                width: largeur,
-                height: Platform.isAndroid || Platform.isIOS ? 150 : 300,
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _image = null;
-                    });
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ClipRRect(
+          alignment: Alignment.center,
+          children: [
+            _existingImageUrl != null && _existingImageUrl!.isNotEmpty
+                ? Container(
+              width: largeur,
+              height:
+              Platform.isAndroid || Platform.isIOS ? 150 : 300,
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _existingImageUrl = '';
+                  });
+                },
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child: Image.file(
-                          _image!,
-                          fit: BoxFit.cover, // Remplir le container
-                          width: double.infinity, // Remplir en largeur
-                          height: double.infinity, // Remplir en hauteur
+                        child: CachedNetworkImage(
+                          imageUrl: _existingImageUrl!,
+                          fit: BoxFit.cover,
+                          // Remplir le container
+                          width: double.infinity,
+                          // Remplir en largeur
+                          height: double.infinity,
+                          // Remplir en hauteur
+                          placeholder: (context, url) =>
+                              Center(
+                                child:
+                                CircularProgressIndicator(), // Indicateur de chargement
+                              ),
+                          errorWidget: (context, url, error) =>
+                              Container(), // Widget en cas d'erreur
                         ),
                       ),
-                      Icon(
-                        Icons.delete,
-                        size: 15,
-                        color: Colors.red,
-                      ),
-                    ],
-                  ),
+                    ),
+                    Icon(
+                      Icons.delete,
+                      size: 15,
+                      color: Colors.red,
+                    ),
+                  ],
                 ),
               ),
+            )
+            // Container(
+            //    width: largeur,
+            //    height:
+            //        Platform.isAndroid || Platform.isIOS ? 150 : 300,
+            //    decoration: BoxDecoration(
+            //      borderRadius:
+            //          BorderRadius.circular(8.0), // Bords arrondis
+            //      border: Border.all(
+            //        color: Colors.grey, // Couleur de la bordure
+            //        width: 1.0, // Épaisseur de la bordure
+            //      ),
+            //    ),
+            //    child: ClipRRect(
+            //      borderRadius: BorderRadius.circular(8.0),
+            //      child: CachedNetworkImage(
+            //        imageUrl: _existingImageUrl!,
+            //        fit: BoxFit.cover, // Remplir le container
+            //        width: double.infinity, // Remplir en largeur
+            //        height: double.infinity, // Remplir en hauteur
+            //        placeholder: (context, url) => Center(
+            //          child:
+            //              CircularProgressIndicator(), // Indicateur de chargement
+            //        ),
+            //        errorWidget: (context, url, error) =>
+            //            Container(), // Widget en cas d'erreur
+            //      ),
+            //    ),
+            //  )
+                : IconButton(
+              onPressed: _pickImage,
+              icon: Icon(
+                Icons.add_a_photo,
+                color: Colors.blue,
+              ),
+            ),
+            // Container(
+            //         width: largeur,
+            //         height:
+            //             Platform.isAndroid || Platform.isIOS ? 150 : 300,
+            //         decoration: BoxDecoration(
+            //           borderRadius:
+            //               BorderRadius.circular(8.0), // Bords arrondis
+            //           border: Border.all(
+            //             color: Colors.grey, // Couleur de la bordure
+            //             width: 1.0, // Épaisseur de la bordure
+            //           ),
+            //         ),
+            //         child: IconButton(
+            //           onPressed: _pickImage,
+            //           icon: Icon(
+            //             Icons.add_a_photo,
+            //             color: Colors.blue,
+            //           ),
+            //         ),
+            //       ),
+            _isLoadingSauv
+                ? _existingImageUrl != null &&
+                _existingImageUrl!.isNotEmpty
+                ? IconButton(
+                onPressed: () {
+                  _clearAllFields2();
+                },
+                icon: Icon(
+                  Icons.delete,
+                  size: 15,
+                  color: Colors.red,
+                ))
+                : IconButton(
+              onPressed: _pickImage,
+              icon: Icon(
+                Icons.add_a_photo,
+                color: Colors.blue,
+              ),
+            )
+                : Container(),
+          ],
+        )
+            : Container(
+          width: largeur,
+          height: Platform.isAndroid || Platform.isIOS ? 150 : 300,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                _image = null;
+              });
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.file(
+                    _image!,
+                    fit: BoxFit.cover, // Remplir le container
+                    width: double.infinity, // Remplir en largeur
+                    height: double.infinity, // Remplir en hauteur
+                  ),
+                ),
+                Icon(
+                  Icons.delete,
+                  size: 15,
+                  color: Colors.red,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -2587,49 +2645,49 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   Future<void> _pickImage() async {
     final ImageSource? source = Platform.isAndroid || Platform.isIOS
         ? await showDialog<ImageSource>(
-            context: context,
-            builder: (BuildContext context) {
-              return SimpleDialog(
-                title: const Text('Choisir une source'),
-                children: <Widget>[
-                  SimpleDialogOption(
-                    padding: EdgeInsets.all(15),
-                    onPressed: () {
-                      Navigator.pop(context, ImageSource.gallery);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.photo),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        const Text('Galerie'),
-                      ],
-                    ),
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Choisir une source'),
+          children: <Widget>[
+            SimpleDialogOption(
+              padding: EdgeInsets.all(15),
+              onPressed: () {
+                Navigator.pop(context, ImageSource.gallery);
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.photo),
+                  SizedBox(
+                    width: 5,
                   ),
-                  // Platform.isAndroid || Platform.isIOS
-                  //     ?
-                  SimpleDialogOption(
-                    padding: EdgeInsets.all(15),
-                    onPressed: () {
-                      Navigator.pop(context, ImageSource.camera);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.camera_alt),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        const Text('Caméra'),
-                      ],
-                    ),
-                  )
-                  // : Container()
-                  ,
+                  const Text('Galerie'),
                 ],
-              );
-            },
-          )
+              ),
+            ),
+            // Platform.isAndroid || Platform.isIOS
+            //     ?
+            SimpleDialogOption(
+              padding: EdgeInsets.all(15),
+              onPressed: () {
+                Navigator.pop(context, ImageSource.camera);
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.camera_alt),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  const Text('Caméra'),
+                ],
+              ),
+            )
+            // : Container()
+            ,
+          ],
+        );
+      },
+    )
         : ImageSource.gallery;
 
     if (source != null && mounted) {
@@ -2639,7 +2697,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
         maxHeight: 720, // Hauteur réduite pour les écrans mobiles
         maxWidth: 1280, // Largeur ajustée
         imageQuality:
-            50, // Augmentation légère de la qualité pour un meilleur rendu
+        50, // Augmentation légère de la qualité pour un meilleur rendu
       );
 
       if (pickedFile != null && mounted) {
@@ -2684,7 +2742,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
       // Vérifier si `datePeremption` est non null, sinon laisser vide.
       _datePeremptionController.text = approvisionnement.datePeremption != null
           ? DateFormat('dd MMMM yyyy', 'fr_FR')
-              .format(approvisionnement.datePeremption!)
+          .format(approvisionnement.datePeremption!)
           : ''; // Valeur par défaut vide
 
       // Récupérer le fournisseur associé à l'approvisionnement
@@ -2794,8 +2852,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
       // Trouver l'index de l'approvisionnement dans la liste temporaire
       final int index = _approvisionnementTemporaire.indexWhere(
-          (approvisionnement) =>
-              approvisionnement == _currentApprovisionnement);
+              (approvisionnement) =>
+          approvisionnement == _currentApprovisionnement);
 
       if (index != -1) {
         print("Approvisionnement trouvé à l'index : $index");
@@ -2818,7 +2876,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
           _currentApprovisionnement!.derniereModification = DateTime.now();
           print(
-              "Dernière modification mise à jour : ${_currentApprovisionnement!.derniereModification}");
+              "Dernière modification mise à jour : ${_currentApprovisionnement!
+                  .derniereModification}");
 
           // Remplacer l'approvisionnement dans la liste
           _approvisionnementTemporaire[index] = _currentApprovisionnement!;
@@ -2898,7 +2957,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
           .parse(_datePeremptionController.text);
 
       // Calculer la différence en jours
-      final difference = datePeremption.difference(DateTime.now()).inDays;
+      final difference = datePeremption
+          .difference(DateTime.now())
+          .inDays;
 
       // Déterminer le message et la couleur
       String message;
@@ -2947,7 +3008,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 class FournisseurSelectionScreen extends StatefulWidget {
   final Fournisseur? selectedFournisseur; // Un seul fournisseur sélectionné
   final Function(Fournisseur)
-      onSelectedFournisseurChanged; // Callback pour le changement
+  onSelectedFournisseurChanged; // Callback pour le changement
 
   const FournisseurSelectionScreen({
     Key? key,
@@ -2975,7 +3036,7 @@ class _FournisseurSelectionScreenState
   Widget build(BuildContext context) {
     final fournisseurProvider = Provider.of<CommerceProvider>(context);
     List<Fournisseur> filteredFournisseurs =
-        fournisseurProvider.fournisseurs.where((fournisseur) {
+    fournisseurProvider.fournisseurs.where((fournisseur) {
       return fournisseur.nom.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
@@ -3044,7 +3105,7 @@ class ProgressDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor:
-          Colors.black.withOpacity(DialogConstants.opacityBackground),
+      Colors.black.withOpacity(DialogConstants.opacityBackground),
       child: Padding(
         padding: const EdgeInsets.all(DialogConstants.padding),
         child: Column(

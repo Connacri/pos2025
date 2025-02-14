@@ -2302,6 +2302,21 @@ class ProductSearchField1 extends StatefulWidget {
 
 class _ProductSearchField1State extends State<ProductSearchField1> {
   bool isPasted = false;
+  late FocusNode _focusNode; // Déclarer un FocusNode
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode(); // Initialiser le FocusNode
+    _focusNode.requestFocus(); // Demander le focus au chargement
+  }
+
+  @override
+  void dispose() {
+    _focusNode
+        .dispose(); // Nettoyer le FocusNode lors de la suppression du widget
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2323,7 +2338,9 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
           VoidCallback onFieldSubmitted) {
         return TextFormField(
           controller: fieldTextEditingController,
-          focusNode: fieldFocusNode,
+          //  focusNode: fieldFocusNode,
+          focusNode: _focusNode,
+          // Utiliser notre FocusNode personnalisé
           inputFormatters: [
             TextInputFormatter.withFunction((oldValue, newValue) {
               // Détecter si c'est un collage en comparant les longueurs
@@ -2332,8 +2349,8 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
                 // Traiter le texte collé de manière asynchrone
                 Future.microtask(() async {
                   if (newValue.text.isNotEmpty) {
-                    final produit =
-                        await commerceProvider.getProduitByQr(newValue.text);
+                    final produit = await commerceProvider
+                        .getProduitByQrFacture(newValue.text);
                     if (produit != null) {
                       facturationProvider.ajouterProduitALaFacture(
                         produit,
@@ -2362,10 +2379,15 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
           decoration: InputDecoration(
             labelText: 'Code Produit (ID ou QR)',
             border: OutlineInputBorder(),
-            suffixIcon: IconButton(
-              icon: Icon(Icons.search),
-              onPressed: onFieldSubmitted,
-            ),
+            suffixIcon: (Platform.isIOS || Platform.isAndroid)
+                ? IconButton(
+                    icon: Icon(Icons.qr_code_scanner),
+                    onPressed: () async {
+                      await scanQRCode(commerceProvider, facturationProvider,
+                          fieldTextEditingController);
+                    },
+                  )
+                : null,
             // prefixIcon: (Platform.isIOS || Platform.isAndroid)
             //     ? IconButton(
             //   icon: Icon(Icons.qr_code_scanner),
@@ -2377,24 +2399,54 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
           onChanged: (value) {
             // Ne rien faire ici, juste laisser l'autocomplétion fonctionner
           },
-          onFieldSubmitted: (value) {
+          onFieldSubmitted: (value) async {
             if (value.isNotEmpty) {
-              widget._processBarcode(
-                context,
-                commerceProvider,
-                facturationProvider,
-                1,
-                facturationProvider.lignesFacture,
-              );
-              fieldTextEditingController.clear();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text('Entrée invalide. Veuillez entrer un code valide.'),
-                ),
-              );
+              final produit =
+                  await commerceProvider.getProduitByQrFacture(value);
+              if (produit != null) {
+                facturationProvider.ajouterProduitALaFacture(
+                  produit,
+                  1,
+                  produit.prixVente,
+                );
+                fieldTextEditingController.clear();
+
+                // Optionnel : Afficher un message de confirmation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${produit.nom} ajouté à la facture'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                // Optionnel : Afficher un message d'erreur
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Aucun produit trouvé pour ce QR code.'),
+                  backgroundColor: Colors.red,
+                ));
+              }
+              setState(() {
+                isPasted = false;
+              });
             }
+
+            // if (value.isNotEmpty) {
+            //   widget._processBarcode(
+            //     context,
+            //     commerceProvider,
+            //     facturationProvider,
+            //     1,
+            //     facturationProvider.lignesFacture,
+            //   );
+            //   fieldTextEditingController.clear();
+            // } else {
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(
+            //       content:
+            //           Text('Entrée invalide. Veuillez entrer un code valide.'),
+            //     ),
+            //   );
+            // }
           },
         );
       },
@@ -2460,30 +2512,55 @@ class _ProductSearchField1State extends State<ProductSearchField1> {
     );
   }
 
-// Future<void> _scanQRCodeFacture() async {
-//   // Simuler un scan de QR code pour tester
-//   final code = await Navigator.of(context).push<String>(
-//     MaterialPageRoute(
-//       builder: (context) => BarcodeScannerWithScanWindow(), //QRViewExample(),
-//     ),
-//   );
-//   final provider = Provider.of<CommerceProvider>(context, listen: false);
-//   final produit = await provider.getProduitByQr(code!);
-//
-//   // Rediriger le focus vers le TextFormField après l'ajout
-//   FocusScope.of(context).requestFocus(_serialFocusNode);
-//
-//   if (produit == null) {
-//     if (code.isNotEmpty && !_qrCodesTemp.contains(code)) {
-//       setState(() {
-//         _qrCodesTemp.add(code);
-//         _serialController.clear();
-//         _searchQr = false;
-//       });
-//     } else {
-//       _serialController.clear();
-//     }
-//     FocusScope.of(context).requestFocus(_serialFocusNode);
-//   }
-// }
+  Future<void> scanQRCode(
+      CommerceProvider commerceProvider,
+      FacturationProvider facturationProvider,
+      TextEditingController fieldTextEditingController) async {
+    // Simuler un scan de QR code pour tester
+    final code = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => BarcodeScannerWithScanWindow(),
+      ),
+    );
+
+    if (code == null || code.isEmpty) {
+      return; // Gérer le cas où aucun code n'est scanné
+    }
+
+    // Récupérer le produit par QR code
+    final produit = await commerceProvider.getProduitByQrFacture(code);
+
+    if (produit != null) {
+      // Ajouter le produit à la facture
+      facturationProvider.ajouterProduitALaFacture(
+          produit, 1, produit.prixVente);
+//744908
+      // Afficher un message de confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${produit.nom} ajouté à la facture'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // Aucun produit trouvé
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Aucun produit trouvé pour ce QR code.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      // Rediriger vers la page d'ajout de produit si nécessaire
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (ctx) => addProduct()),
+      );
+    }
+
+    // Vider le champ après l'ajout
+    fieldTextEditingController.clear();
+
+    // Rétablir le focus sur le champ
+    FocusScope.of(context).requestFocus(_focusNode);
+  }
 }

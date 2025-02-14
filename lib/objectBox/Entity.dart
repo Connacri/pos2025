@@ -496,3 +496,53 @@ class DeletedProduct {
     );
   }
 }
+
+@Entity()
+class Annonce {
+  // L'ID est automatiquement géré par ObjectBox.
+  int id = 0;
+
+  String title;
+  String imageUrl;
+  String webUrl;
+  DateTime createdAt; // Correspond à "created_at" en SQL.
+  String subtitle;
+  double prix;
+
+  // Constructeur
+  Annonce({
+    this.id = 0,
+    required this.title,
+    required this.imageUrl,
+    required this.webUrl,
+    required this.createdAt,
+    required this.subtitle,
+    required this.prix,
+  });
+
+  // Méthode facultative : Convertir l'objet en Map pour faciliter la sérialisation/désérialisation.
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'imageUrl': imageUrl,
+      'webUrl': webUrl,
+      'created_at': createdAt.toIso8601String(),
+      'subtitle': subtitle,
+      'prix': prix,
+    };
+  }
+
+  // Méthode facultative : Créer une instance depuis un Map.
+  factory Annonce.fromMap(Map<String, dynamic> map) {
+    return Annonce(
+      id: map['id'] ?? 0,
+      title: map['title'] as String,
+      imageUrl: map['imageUrl'] as String,
+      webUrl: map['webUrl'] as String,
+      createdAt: DateTime.parse(map['created_at'] as String),
+      subtitle: map['subtitle'] as String,
+      prix: (map['prix'] as num).toDouble(),
+    );
+  }
+}

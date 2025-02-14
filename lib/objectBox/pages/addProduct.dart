@@ -10,7 +10,7 @@ import 'package:dart_date/dart_date.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as su;
 import 'package:path/path.dart' as path;
 import '../Entity.dart';
 import '../MyProviders.dart';
@@ -526,19 +526,21 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                     height: 25,
                     width: 40,
                   ),
-                ), // Flag
+                ),
+          // Flag
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
             child: TextFormField(
               controller: _serialController,
               enabled: !_isLoadingSauv,
-              focusNode: _serialFocusNode, // Attache FocusNode au TextFormField
+              focusNode: _serialFocusNode,
+              // Attache FocusNode au TextFormField
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 labelText: 'Code Barre / QrCode',
                 prefixIcon: Transform.scale(
-                  scale:
-                      0.7, // Ajustez cette valeur pour modifier la taille (1.0 est la taille par défaut)
+                  scale: 0.7,
+                  // Ajustez cette valeur pour modifier la taille (1.0 est la taille par défaut)
                   child: Switch(
                     value: _searchQr,
                     onChanged: (bool newValue) {
@@ -565,7 +567,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                 _addQRCodeFromText(); // Appel lors de l'appui sur "Entrée"
               },
             ),
-          ), // Serial Qr Code
+          ),
+          // Serial Qr Code
           _qrCodesTemp.isEmpty
               ? Container()
               : Padding(
@@ -603,8 +606,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                               Theme.of(context).brightness == Brightness.dark
                                   ? Colors.blueAccent.withOpacity(
                                       0.2) // Couleur pour le thème sombre
-                                  : Colors.blueAccent.withOpacity(
-                                      0.6), // Couleur pour le thème clair
+                                  : Colors.blueAccent.withOpacity(0.6),
+                          // Couleur pour le thème clair
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(20.0), // Coins arrondis
@@ -617,9 +620,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                               size: 25, // Adjust the size as needed
                             ),
                           ),
-                          visualDensity: VisualDensity(
-                              vertical:
-                                  -1), // Ajustement vertical pour recentrer le contenu
+                          visualDensity: VisualDensity(vertical: -1),
+                          // Ajustement vertical pour recentrer le contenu
                           label: Text(
                             code,
                             style: TextStyle(
@@ -630,7 +632,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                   : Colors
                                       .black, // Couleur du texte pour le thème clair
                             ),
-                          ), // Affiche le QR code dans le Chip
+                          ),
+                          // Affiche le QR code dans le Chip
                           deleteIcon: Icon(Icons.delete, color: Colors.red),
 
                           onDeleted: () {
@@ -643,13 +646,15 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                       ),
                     ],
                   ),
-                ), // wrap qrcode
+                ),
+          // wrap qrcode
           _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: buildColumnPicSuppliers(largeur, context),
                 )
-              : Container(), // photo
+              : Container(),
+          // photo
           _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -658,7 +663,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                     controller: _nomController,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next, // Action "Suivant"
+                    textInputAction: TextInputAction.next,
+                    // Action "Suivant"
                     onFieldSubmitted: (_) {
                       _focusNodePV.requestFocus(); // Passe au champ 2
                     },
@@ -715,7 +721,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                     },
                   ),
                 )
-              : Container(), // nom
+              : Container(),
+          // nom
           Container(
             child: !_showDescription
                 ? Container()
@@ -732,8 +739,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                           },
                           maxLines: 5,
                           keyboardType: TextInputType.text,
-                          textInputAction:
-                              TextInputAction.next, // Action "Suivant"
+                          textInputAction: TextInputAction.next,
+                          // Action "Suivant"
                           decoration: InputDecoration(
                             hintText: 'Déscription',
                             border: OutlineInputBorder(
@@ -772,7 +779,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                       ],
                     ),
                   ),
-          ), // description
+          ),
+          // description
           _isFirstFieldRempli || _qrCodesTemp.isNotEmpty
               ? Container(
                   width: largeur,
@@ -787,8 +795,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
                             controller: _prixVenteController,
                             textAlign: TextAlign.center,
-                            textInputAction:
-                                TextInputAction.next, // Action "Suivant"
+                            textInputAction: TextInputAction.next,
+                            // Action "Suivant"
                             onFieldSubmitted: (_) {
                               _focusNodeStock
                                   .requestFocus(); // Passe au champ 2
@@ -967,8 +975,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                     },
                                     controller: _qtyPartielController,
                                     textAlign: TextAlign.center,
-                                    textInputAction: TextInputAction
-                                        .next, // Action "Suivant"
+                                    textInputAction: TextInputAction.next,
+                                    // Action "Suivant"
                                     // onFieldSubmitted: (_) {
                                     //   _focusNodeStock
                                     //       .requestFocus(); // Passe au champ 2
@@ -1126,7 +1134,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                       ],
                     ),
                   ),
-          ), // details
+          ),
+          // details
 
           ///********************************************************************** 1
           Padding(
@@ -1307,7 +1316,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                       ),
                                     ),
                             ],
-                          ), // stock
+                          ),
+                          // stock
                           // Flexible(
                           //   flex: 2,
                           //   child: Padding(
@@ -1512,8 +1522,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                               ),
                                             )
                                           : Chip(
-                                              label: Text(_selectedFournisseur!
-                                                  .nom), // Afficher le nom du fournisseur sélectionné
+                                              label: Text(
+                                                  _selectedFournisseur!.nom),
+                                              // Afficher le nom du fournisseur sélectionné
 
                                               onDeleted: null,
                                               // backgroundColor: Colors.grey
@@ -1559,7 +1570,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                                       });
                                                     }
                                                   }
-                                                : null, // Désactive si la condition est fausse
+                                                : null,
+                                            // Désactive si la condition est fausse
 
                                             child: const Text(
                                                 'Selectionné un Fournisseur'),
@@ -1604,7 +1616,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                   ? 'Modifier le Stock'
                                   : 'Ajouter ce Stock'),
                             ),
-                          ), //Ajouter ce Stock
+                          ),
+                          //Ajouter ce Stock
                           Flexible(
                             child: Container(
                               width: largeur,
@@ -1738,7 +1751,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                 },
                               ),
                             ),
-                          ), //Liste des approvisionnements
+                          ),
+                          //Liste des approvisionnements
                         ],
                       ),
                     ),
@@ -1825,7 +1839,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   Future<String> uploadImageToSupabase(File image, String? oldImageUrl) async {
     final String bucket = 'products';
-    final supabase = Supabase.instance.client;
+    final supabase = su.Supabase.instance.client;
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final fileName =
         '${_prixVenteController.text}${_stockController.text}$timestamp${path.extension(image.path)}';
@@ -2317,19 +2331,20 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                               aspectRatio: 1, // Conserve un ratio 1:1
                               child: CachedNetworkImage(
                                 imageUrl: produit.image!,
-                                fit: BoxFit
-                                    .cover, // Remplit l'espace sans déformation
-                                width: screenWidth *
-                                    0.4, // 60% de la largeur de l'écran
-                                height: screenHeight *
-                                    0.4, // 60% de la largeur pour garder le ratio
+                                fit: BoxFit.cover,
+                                // Remplit l'espace sans déformation
+                                width: screenWidth * 0.4,
+                                // 60% de la largeur de l'écran
+                                height: screenHeight * 0.4,
+                                // 60% de la largeur pour garder le ratio
                                 placeholder: (context, url) => Center(
                                   child:
                                       CircularProgressIndicator(), // Indicateur de chargement
                                 ),
                                 errorWidget: (context, url, error) => Center(
                                   child: Lottie.asset(
-                                    'assets/lotties/1 (8).json', // Chemin vers ton fichier Lottie
+                                    'assets/lotties/1 (8).json',
+                                    // Chemin vers ton fichier Lottie
                                     width: screenWidth *
                                         0.2, // Ajuste la taille de l'erreur à 30%
                                     height: screenWidth * 0.2,
@@ -2340,7 +2355,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                           )
                         : Center(
                             child: Lottie.asset(
-                              'assets/lotties/1 (8).json', // Chemin vers ton fichier Lottie
+                              'assets/lotties/1 (8).json',
+                              // Chemin vers ton fichier Lottie
                               width: screenWidth *
                                   0.2, // Ajuste la taille de l'erreur à 30%
                               height: screenWidth * 0.2,
@@ -2383,15 +2399,15 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                           Brightness.dark
                                       ? Colors.blueAccent.withOpacity(
                                           0.2) // Couleur pour le thème sombre
-                                      : Colors.blueAccent.withOpacity(
-                                          0.6), // Couleur pour le thème clair
+                                      : Colors.blueAccent.withOpacity(0.6),
+                                  // Couleur pour le thème clair
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
                                         20.0), // Coins arrondis
                                   ),
                                   avatar: Align(
-                                    alignment: Alignment
-                                        .center, // Centre l'avatar verticalement
+                                    alignment: Alignment.center,
+                                    // Centre l'avatar verticalement
                                     child: CircularFlagDetector(
                                       barcode: code,
                                       size: 25, // Taille ajustée
@@ -2422,22 +2438,23 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                       Brightness.dark
                                   ? Colors.grey.withOpacity(
                                       0.2) // Couleur pour le thème sombre
-                                  : Colors.grey.withOpacity(
-                                      0.6), // Couleur pour le thème clair
+                                  : Colors.grey.withOpacity(0.6),
+                              // Couleur pour le thème clair
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                     20.0), // Coins arrondis
                               ),
                               avatar: Icon(
-                                Icons
-                                    .more_horiz, // Icône indiquant plus d'éléments
+                                Icons.more_horiz,
+                                // Icône indiquant plus d'éléments
                                 color: Theme.of(context).brightness ==
                                         Brightness.dark
                                     ? Colors.white
                                     : Colors.black,
                               ),
                               label: Text(
-                                "+${produit.qr!.split(',').length - 3}", // Nombre d'éléments restants
+                                "+${produit.qr!.split(',').length - 3}",
+                                // Nombre d'éléments restants
                                 style: TextStyle(
                                   color: Theme.of(context).brightness ==
                                           Brightness.dark
@@ -2460,8 +2477,8 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                                       Brightness.dark
                                   ? Colors
                                       .white // Couleur du texte pour le thème sombre
-                                  : Colors
-                                      .black, // Couleur du texte pour le thème clair
+                                  : Colors.black,
+                              // Couleur du texte pour le thème clair
                               fontSize: 20,
                               fontFamily: 'Oswald',
                             ),
@@ -2632,9 +2649,12 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                             borderRadius: BorderRadius.circular(8.0),
                             child: CachedNetworkImage(
                               imageUrl: _existingImageUrl!,
-                              fit: BoxFit.cover, // Remplir le container
-                              width: double.infinity, // Remplir en largeur
-                              height: double.infinity, // Remplir en hauteur
+                              fit: BoxFit.cover,
+                              // Remplir le container
+                              width: double.infinity,
+                              // Remplir en largeur
+                              height: double.infinity,
+                              // Remplir en hauteur
                               placeholder: (context, url) => Center(
                                 child:
                                     CircularProgressIndicator(), // Indicateur de chargement

@@ -13,7 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/date_symbol_data_local.dart'; // Importez cette ligne
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as su;
 import 'package:window_manager/window_manager.dart';
 import 'firebase_options.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -26,8 +26,7 @@ import 'objectBox/hash.dart';
 ///gere les gestu
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
-  Set<PointerDeviceKind> get dragDevices =>
-      {
+  Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.mouse,
         PointerDeviceKind.touch,
         PointerDeviceKind.stylus,
@@ -37,6 +36,7 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 //late ObjectBox objectbox;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeSupabase(); // Initialiser Supabase
 // Vérifier que la plateforme est desktop avant d'initialiser window_manager
   if (!Platform.isAndroid && !Platform.isIOS) {
     // Initialiser window_manager uniquement pour les plateformes desktop
@@ -71,15 +71,10 @@ Future<void> main() async {
   } else {
     print("Google Mobile Ads n'est pas supporté sur cette plateforme");
   }
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
   //final objectBox = await ObjectBox.create();
-  await Supabase.initialize(
-    url: 'https://wirxpjoeahuvjoocdnbk.supabase.co',
-    anonKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpcnhwam9lYWh1dmpvb2NkbmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTYxNjI0MzAsImV4cCI6MjAzMTczODQzMH0.MQpp7i2TdH3Q5aPEbMq5qvUwbuYpIX8RccW_GH64r1U',
-  );
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //   final String message = 'objectbox-desktop-service';
@@ -120,18 +115,32 @@ Future<void> main() async {
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
   runApp(
     MyApp(
-      // objectBox: objectBox,
-    ),
+        // objectBox: objectBox,
+        ),
   );
 }
 
-// Future<Database> initsembastDatabase() async {
-//   final appDocumentDir = await getApplicationDocumentsDirectory();
-//   final dbPath = p.join(appDocumentDir.path, 'my_sembast_database.db');
-//   final database = await databaseFactoryIo.openDatabase(dbPath);
-//   return database;
-// }
-//FlutterNativeSplash.remove();
+Future<void> initializeSupabase() async {
+  const supabaseUrl = 'https://zjbnzghyhdhlivpokstz.supabase.co';
+  const supabaseKey =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqYm56Z2h5aGRobGl2cG9rc3R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2ODA1MjcsImV4cCI6MjA1NDI1NjUyN30.99PBeSXyoFJQMFopizHfLDlqLrMunSBLlBfTGcLIpv8';
+  try {
+    await su.Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseKey,
+      debug: true,
+    );
+
+    if (su.Supabase.instance == null) {
+      print('Supabase initialization failed.');
+      return;
+    }
+
+    print('Supabase initialized successfully.');
+  } catch (error) {
+    print('Error initializing Supabase: $error');
+  }
+}
 
 Future initialization(BuildContext? context) async {
   Future.delayed(Duration(seconds: 5));
@@ -203,15 +212,16 @@ class _MyAppState extends State<MyApp> {
             bodyLarge: TextStyle(color: Colors.white),
           ),
         ),
-        home: Platform.isAndroid || Platform.isIOS
-            ? MyMain()
-            : _isLicenseValidated
-            ? MyMain()
-            : hashPage()
-      // verifi_auth2(
-      //     // objectBox: objectBox,
-      //     ),
-    );
+        home: //Platform.isAndroid || Platform.isIOS
+            // ?
+            MyMain()
+        // : _isLicenseValidated
+        //     ? MyMain()
+        //     : hashPage()
+        // verifi_auth2(
+        //     // objectBox: objectBox,
+        //     ),
+        );
   }
 
   @override

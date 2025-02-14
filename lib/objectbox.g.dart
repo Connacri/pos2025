@@ -618,6 +618,50 @@ final _entities = <obx_int.ModelEntity>[
             relationTarget: 'Document')
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(17, 3059120392603791043),
+      name: 'Annonce',
+      lastPropertyId: const obx_int.IdUid(7, 8384532891869150998),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 4258561753768691301),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 1679748998280210047),
+            name: 'title',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 4459475118495653295),
+            name: 'imageUrl',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 8575195932530207384),
+            name: 'webUrl',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 4533146163755781279),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 4023268566861324328),
+            name: 'subtitle',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 8384532891869150998),
+            name: 'prix',
+            type: 8,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -656,7 +700,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(16, 6384163625204797289),
+      lastEntityId: const obx_int.IdUid(17, 3059120392603791043),
       lastIndexId: const obx_int.IdUid(24, 6359461765771555142),
       lastRelationId: const obx_int.IdUid(2, 4545419348761092860),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -1407,6 +1451,58 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0);
           object.facture.attach(store);
           return object;
+        }),
+    Annonce: obx_int.EntityDefinition<Annonce>(
+        model: _entities[9],
+        toOneRelations: (Annonce object) => [],
+        toManyRelations: (Annonce object) => {},
+        getId: (Annonce object) => object.id,
+        setId: (Annonce object, int id) {
+          object.id = id;
+        },
+        objectToFB: (Annonce object, fb.Builder fbb) {
+          final titleOffset = fbb.writeString(object.title);
+          final imageUrlOffset = fbb.writeString(object.imageUrl);
+          final webUrlOffset = fbb.writeString(object.webUrl);
+          final subtitleOffset = fbb.writeString(object.subtitle);
+          fbb.startTable(8);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, titleOffset);
+          fbb.addOffset(2, imageUrlOffset);
+          fbb.addOffset(3, webUrlOffset);
+          fbb.addInt64(4, object.createdAt.millisecondsSinceEpoch);
+          fbb.addOffset(5, subtitleOffset);
+          fbb.addFloat64(6, object.prix);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final titleParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 6, '');
+          final imageUrlParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 8, '');
+          final webUrlParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 10, '');
+          final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0));
+          final subtitleParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 14, '');
+          final prixParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
+          final object = Annonce(
+              id: idParam,
+              title: titleParam,
+              imageUrl: imageUrlParam,
+              webUrl: webUrlParam,
+              createdAt: createdAtParam,
+              subtitle: subtitleParam,
+              prix: prixParam);
+
+          return object;
         })
   };
 
@@ -1833,4 +1929,35 @@ class LigneDocument_ {
   /// See [LigneDocument.facture].
   static final facture = obx.QueryRelationToOne<LigneDocument, Document>(
       _entities[8].properties[7]);
+}
+
+/// [Annonce] entity fields to define ObjectBox queries.
+class Annonce_ {
+  /// See [Annonce.id].
+  static final id =
+      obx.QueryIntegerProperty<Annonce>(_entities[9].properties[0]);
+
+  /// See [Annonce.title].
+  static final title =
+      obx.QueryStringProperty<Annonce>(_entities[9].properties[1]);
+
+  /// See [Annonce.imageUrl].
+  static final imageUrl =
+      obx.QueryStringProperty<Annonce>(_entities[9].properties[2]);
+
+  /// See [Annonce.webUrl].
+  static final webUrl =
+      obx.QueryStringProperty<Annonce>(_entities[9].properties[3]);
+
+  /// See [Annonce.createdAt].
+  static final createdAt =
+      obx.QueryDateProperty<Annonce>(_entities[9].properties[4]);
+
+  /// See [Annonce.subtitle].
+  static final subtitle =
+      obx.QueryStringProperty<Annonce>(_entities[9].properties[5]);
+
+  /// See [Annonce.prix].
+  static final prix =
+      obx.QueryDoubleProperty<Annonce>(_entities[9].properties[6]);
 }

@@ -6,7 +6,7 @@ import 'package:kenzy/objectBox/pages/home_Carousel.dart';
 import 'package:kenzy/objectBox/tests/hotelScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as su;
 import '../objectBox/pages/addProduct.dart';
 import '../objectBox/pages/ClientListScreen.dart';
 import '../objectBox/tests/cruds.dart' as cruds;
@@ -595,7 +595,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (ctx) => ProduitListPage(
-                                supabase: Supabase.instance.client,
+                                supabase: su.Supabase.instance.client,
                                 objectboxStore: widget.objectBox.store)));
                       },
                       icon: Icon(Icons.local_police),
@@ -1329,7 +1329,7 @@ class _adaptiveHomeState extends State<adaptiveHome> {
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (ctx) => ProduitListPage(
-                              supabase: Supabase.instance.client,
+                              supabase: su.Supabase.instance.client,
                               objectboxStore: widget.objectBox.store)));
                     },
                     icon: Icon(Icons.local_police),

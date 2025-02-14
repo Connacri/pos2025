@@ -194,6 +194,24 @@ class CommerceProvider extends ChangeNotifier {
     return null; // Aucun produit trouvé avec le QR code donné
   }
 
+  Future<Produit?> getProduitByQrFacture(String qrCode) async {
+    // Vérifier si le QR code commence par '1613' et le transformer si nécessaire
+    if (qrCode.startsWith('1613')) {
+      qrCode = '613' + qrCode.substring(4); // Remplace 1613 par 613
+    }
+
+    // Construire une requête pour trouver le produit correspondant
+    final query = _objectBox.produitBox.query(
+      Produit_.qr.contains(qrCode,
+          caseSensitive: false), // Recherche dans le champ 'qr'
+    );
+
+    // Exécuter la requête et récupérer le premier résultat
+    final result = await query.build().findFirst();
+
+    return result;
+  }
+
   // Future<void> removeQRCodeFromProduit(int produitId, String qrCode) async {
   //   // Récupérer le produit par ID
   //   final produit = await getProduitById(produitId);
